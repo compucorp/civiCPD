@@ -1,5 +1,8 @@
 <?php
 
+define('CPD_PATH', 'http://ies-uk.ccuptest.co.uk/sites/all/extensions/civiCPD/');
+define('CPD_DIR', '/var/www/ies-uk.ccuptest.co.uk/httpdocs/sites/all/extensions/civiCPD/');
+
 require_once 'civicpd.civix.php';
 
 /**
@@ -188,7 +191,7 @@ function civicpd_civicrm_pageRun( &$page ) {
         	$total_credits = 0;
     	}
 	
-		$mcd_cpd_message = 'You currently have <strong>'. $total_credits .'</strong> ' . $civi_cpd_short_name . ' credits for ' . $_SESSION["report_year"] . '. <a href="/civicrm/civicpd/report"><u>Click here</u></a> to update your ' . $civi_cpd_short_name . ' activities.';
+		$mcd_cpd_message = 'You currently have <strong>'. $total_credits .'</strong> ' . $civi_cpd_short_name . ' hours for 55' . $_SESSION["report_year"] . '. <a href="/civicrm/civicpd/report"><u>Click here</u></a> to update your ' . $civi_cpd_short_name . ' activities.';
 		
 		// IF THIS CONTACT HAS AN APPLICABLE MEMBERSHIP TYPE, INSERT THE CPD INFO IN THEIR CONTACT DASHBOARD
     	$sql = 'SELECT civi_cpd_membership_type.membership_id

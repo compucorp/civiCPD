@@ -44,7 +44,7 @@
 <tr>
 	<td>
     	<div class="header-dark">
-    	{ts}Your {$civi_cpd_long_name} Credits{/ts} 
+    	{ts}Your {$civi_cpd_long_name} Hours{/ts} 
         </div>	  
         <div id="cpddescription">
     		<div class="view-content"> 

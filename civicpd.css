@@ -14,3 +14,175 @@ body.page-civicrm-civicpd #cover {
 	display: none;
 	position: fixed;
 }
+
+/* Report Page */
+
+
+#report_year {
+    display: inline-block;
+    margin-left: 5px;
+    position: relative;
+}
+
+p.cpd-message {
+    font-style: italic;
+    font-weight: normal;
+}
+.edit-activity-response {
+margin: 10px 0 10px 0;
+}
+
+#category-list tr {
+margin-top: 400px;
+}
+
+#edit-response{
+    margin: 10px 0;
+}
+
+.success {
+   color:#14CC21;
+}
+
+.failure {
+   color:#EB1040;
+}
+
+.activity-item-manual {
+margin: 0 10% 0 10%;
+float: left;
+width: 30%;
+height: 200px;
+}
+
+.activity-item-import {
+margin: 0 10% 0 10%;
+float: right;
+width: 30%;
+height: 200px;
+}
+
+.add-new-category,
+.activity-item-import-pdf,
+.activity-item,
+.activity-list {
+    display:none;
+}
+
+.clear{
+clear:both;}
+ 
+.graphcont {
+margin: -60px 60%;
+color:#000;
+font-weight:700;
+float:right;
+}
+ 
+.graph {
+float:left;
+margin-top:10px;
+background-color:#cecece;
+position:relative;
+width:280px;
+padding:0
+}
+ 
+.graph .bar {
+display:block;
+position:relative;
+background-color:#14CC21;
+background-position:right center;
+background-repeat:repeat-x;
+border-right:#538e02 1px solid;
+text-align:center;
+color:#fff;
+height:25px;
+font-family:Arial, Helvetica, sans-serif;
+font-size:12px;
+line-height:1.9em
+}
+ 
+.graph .bar span {
+position:absolute;
+left:1em
+}
+
+.fileUpload {
+	position: relative;
+	overflow: hidden;
+	margin: 10px;
+}
+.fileUpload input.upload {
+	position: absolute !important;
+	top: 0 !important;
+	right: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 20px !important;
+	cursor: pointer !important;
+	opacity: 0 !important;
+	filter: alpha(opacity=0) !important;
+}
+
+/* Full Report */
+
+#button{
+cursor:pointer;
+background-color: white;
+color: grey;
+font-family: Helvetica,Arial,Sans;
+    font-size: 10px;
+}
+
+
+#crm-container p {
+    font-family: Helvetica,Arial,Sans;
+    font-size: 12px;
+    margin-bottom: 4px;
+    padding: 4px 6px;
+}
+
+#crm-container table.report-table {
+    border-collapse: inherit;
+    width: 100%;
+}
+
+#crm-container table.report-table th {
+    background-color: #EFEFEF;
+    border: 1px solid #CCCCCC;
+    color: #666666;
+}
+ 
+#crm-container table.report-table td {
+    border: 1px solid #EFEFEF;
+}
+
+#report_year {
+    display: inline-block;
+    margin-left: 5px;
+    position: relative;
+}
+
+SPAN.searchword { background-color:yellow; }
+
+.sortable {
+    width:823px; border:1px solid #ccc; border-bottom:none
+}
+
+.sortable .head,
+.sortable .desc, 
+.sortable .asc {
+    cursor:pointer;
+}
+.sortable .head:hover, .sortable .desc:hover, .sortable .asc:hover {
+    color:black
+}
+
+/* Edit */
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-content, .ui-widget-header {
+    color: #3E3E3E;
+    font-family: helvetica;
+    font-size: 0.95em;
+}

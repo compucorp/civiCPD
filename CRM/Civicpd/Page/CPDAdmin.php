@@ -1,28 +1,12 @@
 <?php
-/*
-+--------------------------------------------------------------------+
-| CiviCDP version alpha 1.0                                          |
-+--------------------------------------------------------------------+
-| File: CDPAdmin.php                                                 |
-+--------------------------------------------------------------------+
-| This file is a part of the CiviCPD extension.                      |
-|                                                                    |
-| This file is the Administrators admin control panel and provides   |
-| a snapshot of the organization's CPD activities and credits        |
-| based on the year in question.                                     |
-|                                                                    |
-+--------------------------------------------------------------------+
-*/
+
 
 require_once 'CRM/Core/Page.php';
 
 class CRM_Civicpd_Page_CPDAdmin extends CRM_Core_Page {
   function run() {
-  
-  	// ADD STYLESHEET
 	CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd.css');
   
-  	// HANDLE ANY PRE-PROCESSING FIRST
   	if( isset( $_POST['action'] ) &&  $_POST['action'] == "update" ) {
   	
   		/**
@@ -53,15 +37,6 @@ class CRM_Civicpd_Page_CPDAdmin extends CRM_Core_Page {
   		// CREATE SQL FOR civi_cpd_defaults
   		$sql = "INSERT INTO civi_cpd_defaults (name, value) VALUES "; 
   		
-  		/**
-  		 * SET THE LIMIT ON MEMBER'S EDITING THEIR ACTIVITES 
-  		 * 0 = UNLIMITED
-  		 * 1 = CURRENT YEAR
-  		 * 2 = PAST 2 YEARS
-  		 * 3 = PAST 3 YEARS
-  		 * 5 = PAST 5 YEARS
-  		 */
-  		 
   		 if( isset( $_POST['member_update_limit'] ) ) {
   		 	$sql .= "('member_update_limit', '".$_POST['member_update_limit']."'),"; 
   		 }
