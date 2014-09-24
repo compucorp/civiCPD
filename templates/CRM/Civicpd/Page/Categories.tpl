@@ -4,7 +4,7 @@
 <div><a class="new-category-button" href="#"">New</a></div>
 <div class="add-new-category">
     <p><em>Add Category: {$add-response}</em></p>
-    <form  method="post" action="/civicrm/civicpd/categories">
+    <form  method="post" action={crmURL p="civicrm/civicpd/categories"}>
         <input type="hidden" value="insert" name="action">
         <table height="180px" width="50%" cellspacing="0" cellpadding="0" border="0" align="center">
             <tbody>

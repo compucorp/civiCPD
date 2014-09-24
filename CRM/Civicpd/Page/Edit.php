@@ -51,11 +51,15 @@ class CRM_Civicpd_Page_Edit extends CRM_Core_Page {
                 $this->assign('category', $dao->category);
                 $this->assign('description', $dao->description);
                 $this->assign('minimum', $dao->minimum);
-                $this->assign('delete_url', '/civicrm/civicpd/categories?action=delete&id='.$catid);
+                
+                // Create the delete URL
+                $delete_url = CRM_Utils_System::url("civicrm/civicpd/categories", "action=delete&id=" . $catid, true, null, false, true);
+                $this->assign('delete_url', $delete_url);
+                
                 $this->assign('submit_button', '<input type="submit" name="submit" id="submit" value="Update" class="form-submit-inline" />');
                 $this->assign('cancel_button', '<input type="button" name="cancel" id="cancel" value="Cancel" onclick="history.back(1);" />');
                 $this->assign('delete_button', '<div style="display: inline-block; margin-bottom: -19px; margin-top: 20px;">
-                    <a title="Delete Category" class="delete button" href="#"><span><div class="icon delete-icon"></div>Delete Category</span></a></div>');
+                    <a title="Delete Category" class="delete button" href="' . $delete_url . '"><span><div class="icon delete-icon"></div>Delete Category</span></a></div>');
         } else {
             header('Location: /civicrm/civicpd/categories');
             exit;

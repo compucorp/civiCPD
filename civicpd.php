@@ -1,7 +1,10 @@
 <?php
 
+// @TODO -> Should be removed totally with all the references
 define('CPD_PATH', 'http://ies-uk.ccuptest.co.uk/sites/all/extensions/civiCPD/');
-define('CPD_DIR', '/var/www/ies-uk.ccuptest.co.uk/httpdocs/sites/all/extensions/civiCPD/');
+
+// @TODO -> Change this URL to dynamic through CIVI CRM
+define('CPD_DIR', 'C:/xampp/htdocs/workplace/drupal-civi-dev/sites/all/extensions/civiCPD/');
 
 require_once 'civicpd.civix.php';
 

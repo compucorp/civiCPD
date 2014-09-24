@@ -13,8 +13,8 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
   
     function run() {
         
-        drupal_add_css(CPD_PATH . 'civicpd.css', array('type' => 'external'));
-        drupal_add_js(CPD_PATH . 'js/report.js', array('type' => 'external'));
+        CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd.css');
+        CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/report.js', 0 , 'page-header');
         
         $session = CRM_Core_Session::singleton();
 
@@ -224,8 +224,12 @@ function civi_cpd_report_get_csv_import($category_id) {
 }
 
 function civi_cpd_report_get_pdf_import($user_id) {
+    
+    // PDF post URL
+    $pdf_post_url = CRM_Utils_System::url("civicrm/civicpd/report", null, true, null, false, true);
+    
     $pdf_import = '<div class="activity-item-import-pdf">
-    <form  method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data">
+    <form  method="post" action="' . $pdf_post_url . '"  enctype="multipart/form-data">
         <input type="hidden" value="import-pdf" name="action">
         <input type="hidden" value="' . $user_id . '" name="user_id">
         <input type="file" name="file" id="file">

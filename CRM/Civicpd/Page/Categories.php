@@ -5,9 +5,9 @@ require_once 'CRM/Core/Page.php';
 class CRM_Civicpd_Page_Categories extends CRM_Core_Page {
   function run() {
 
-        drupal_add_css(CPD_PATH . 'civicpd.css', array('type' => 'external'));
-        drupal_add_js(CPD_PATH . 'js/category.js', array('type' => 'external'));
-
+        CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd.css');
+        CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/category.js');
+        
         if (isset($_GET['action']) || isset($_POST['action'])) {
 
             $action = $_REQUEST['action'];
@@ -59,14 +59,16 @@ class CRM_Civicpd_Page_Categories extends CRM_Core_Page {
     $dao = CRM_Core_DAO::executeQuery($sql);
     $categories = "";
   	
-    while( $dao->fetch( ) ) {        
+    while( $dao->fetch( ) ) {
+        
+        $edit_url = CRM_Utils_System::url("civicrm/civicpd/EditCategories", "id=" . $dao->id, true, null, false, true);
+        $delete_url = CRM_Utils_System::url("civicrm/civicpd/categories", "action=delete&id=" . $dao->id, true, null, false, true);
+        
         $categories .= "<tr>"
             . "<td nowrap=nowrap><strong>" . $dao->category . "</strong></td>" 
             . "<td><em>" . $dao->description . "</em></td>"  
             . "<td style='text-align: center;'>" . $dao->minimum . "</td>" 
-            . "<td style='text-align: center;'><a href='/civicrm/civicpd/EditCategories?"
-            . "id=".$dao->id."'>edit</a><a href='/civicrm/civicpd/categories?action=" 
-            . "delete&id=".$dao->id."'> | delete</a></td></tr>";
+            . "<td style='text-align: center;'><a href='" . $edit_url . "'>edit</a><a href='" . $delete_url . "'> | delete</a></td></tr>";
      }
      
     $sql = "SELECT * FROM civi_cpd_defaults";

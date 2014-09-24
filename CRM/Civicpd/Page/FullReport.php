@@ -5,10 +5,11 @@ require_once 'CRM/Core/Page.php';
 class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
     
     function run() {
-        drupal_add_css(CPD_PATH . 'civicpd.css', array('type' => 'external'));
-        drupal_add_js(CPD_PATH . 'js/table_sorter.js', array('type' => 'external'));
-        drupal_add_js(CPD_PATH . 'js/table_filter.js', array('type' => 'external'));
-        drupal_add_js(CPD_PATH . 'js/full_report.js', array('type' => 'external'));
+      
+        CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd.css');
+        CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/table_sorter.js', 0 , 'page-header');
+        CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/table_filter.js', 0, 'page-header');
+        CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/full_report.js', 0, 'page-header');
         
         if (isset($_POST)) {
             $out = '';
@@ -31,7 +32,6 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
            }
         }  
 
-    CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd.css');
     $sql = "SELECT * FROM civi_cpd_defaults";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $arr_defaults = array();

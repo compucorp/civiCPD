@@ -1,6 +1,6 @@
 <h3>Use the form below to edit this category</h3>
 <p>&nbsp;</p>
-<form action="/civicrm/civicpd/categories" method="post">
+<form action={crmURL p="civicrm/civicpd/categories"} method="post">
   <input type="hidden" value="{$id}" name="catid">
   <input type="hidden" value="{$action}" name="action">
   <table width="500" border="0" cellspacing="5" cellpadding="5">
