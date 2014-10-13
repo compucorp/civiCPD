@@ -65,7 +65,9 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
         $this->assign('total_credits', civi_cpd_report_get_total_credits());
         $this->assign('uploaded_activity_list', civi_cpd_report_get_uploaded_activity_list(
             $session->get('userID')));
-        
+        $this->assign('approved', civi_cpd_report_get_approval_status());
+        $this->assign('imageUrl', CPD_PATH . '/assets/approved.png');
+
         civi_cpd_report_unset_session();
 
         parent::run();
@@ -462,7 +464,7 @@ function civi_cpd_report_get_uploaded_activity_list($user_id) {
                 $pdf_upload_table .= '<tr>' .
                     '<td width="40%" valign="top">' . date("M d, Y", strtotime(substr($upload, 0, 10))) . 
                         '</td>' .
-                    '<td width="20%" valign="top""><a href="/civicrm/civicpd/report&action=download_pdf&upload_id=' . 
+                    '<td width="20%" valign="top""><a href="/civicrm/civicpd/report&action=download_pdf&upload_id=' .
                         substr($upload, 0, -4) . '"> view </a>';
 
                 $member_update_limit = civi_crm_report_get_member_update_limit();
@@ -779,4 +781,33 @@ function civi_cpd_report_validate_number($var) {
     if (is_numeric($var)) {
         return TRUE;
     }
+}
+
+function civi_cpd_report_get_approval_status() {
+    $sql
+      = "
+        SELECT a.approved
+        FROM civi_cpd_activities a
+        WHERE
+            a.contact_id = %0
+       	    AND YEAR(a.credit_date) = %1
+    ";
+
+    $params = array(
+      array((int) civi_cpd_report_get_contact_id(), 'Integer'),
+      array((int) $_SESSION['report_year'], 'Integer')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+
+    $total = $approved = 0;
+    while ($dao->fetch()) {
+        if ($dao->approved) {
+            $approved++;
+        }
+
+        $total++;
+    }
+
+    return ($total && $total == $approved);
 }
