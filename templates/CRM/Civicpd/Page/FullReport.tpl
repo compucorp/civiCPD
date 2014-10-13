@@ -13,7 +13,7 @@
 <script type="text/javascript">
     var sorter=new table.sorter("sorter");
     sorter.init("sorter",1);
-    <!-- 
+    <!--
 
     if (window.location.href.indexOf('snippet=2')  != -1) {
         cj('.ui-progressbar-value.ui-widget-header.ui-corner-left.ui-corner-right').hide();
@@ -25,4 +25,4 @@
     //-->
 </script>
 
-{/literal} 
+{/literal}

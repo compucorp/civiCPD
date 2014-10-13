@@ -7,7 +7,7 @@ cj(function(){
        this.css("top", (cj(window).height() / 2) - (this.outerHeight() / 2));
        this.css("left", (cj(window).width() / 2) - (this.outerWidth() / 2));
        return this;
-    }  
+    };
     
     cj('#select_year').change(function() {
        
@@ -62,6 +62,43 @@ cj(function(){
 
     cj('#print_button').click(function() {
         window.print();
-    });	
+    });
+
+    cj('.approve').on('click', function () {
+      var checkbox = cj(this);
+
+      var year = cj('#select_year option').filter(':selected').val();
+      var cid = cj(this).data('cid');
+
+      var result = window.confirm('Please confirm that you would like to approve the activity');
+
+      if (result) {
+        var handleResponse = function (response) {
+          if (response == 0) handleError(response);
+          else if (response == 1) handleSuccess(response);
+        };
+
+        var handleSuccess = function () {
+          var msg = 'Activity ' + (checkbox.prop('checked') ? 'approved' : 'unapproved');
+
+          CRM.alert('', msg, 'success');
+        };
+
+        var handleError = function () {
+          CRM.alert('Please refresh the page and try again', 'Oops! There was a problem', 'error');
+
+          checkbox.prop('checked', !checkbox.prop('checked'));
+        };
+
+        cj.ajax({
+          type: 'POST',
+          url: window.location.origin + '/civicrm/civicpd/fullreport?action=approve',
+          data: {cid: cid, year: year},
+          success: handleResponse,
+          error: handleError
+        });
+      }
+
+   });
 			
 });

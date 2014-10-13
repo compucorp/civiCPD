@@ -809,5 +809,7 @@ function civi_cpd_report_get_approval_status() {
         $total++;
     }
 
+    $dao->free();
+
     return ($total && $total == $approved);
 }
