@@ -25,5 +25,6 @@ CREATE  TABLE IF NOT EXISTS civi_cpd_activities (
   credits DECIMAL(6,2) NOT NULL ,
   activity VARCHAR(45) NOT NULL ,
   notes VARCHAR(255) NULL ,
+  approved TINYINT NOT NULL DEFAULT 1,
   PRIMARY KEY (id, contact_id, category_id) )
 ENGINE = InnoDB;
