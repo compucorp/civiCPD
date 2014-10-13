@@ -1,12 +1,18 @@
 <?php
 
-// @TODO -> Should be removed totally with all the references
-define('CPD_PATH', 'http://ies-uk.ccuptest.co.uk/sites/all/extensions/civiCPD/');
+//define('CPD_PATH', 'http://ies-uk.ccuptest.co.uk/sites/all/extensions/civiCPD/');
 
-// @TODO -> Change this URL to dynamic through CIVI CRM
-define('CPD_DIR', 'C:/xampp/htdocs/workplace/drupal-civi-dev/sites/all/extensions/civiCPD/');
+//define('CPD_DIR', 'C:/xampp/htdocs/workplace/drupal-civi-dev/sites/all/extensions/civiCPD/');
+
+define('CPD_EXT_NAME', 'ca.lunahost.civicpd');
+
+civicpd_setupPaths();
 
 require_once 'civicpd.civix.php';
+
+///////////
+// Hooks //
+///////////
 
 /**
  * Implementation of hook_civicrm_config
@@ -84,8 +90,8 @@ function civicpd_civicrm_navigationMenu( &$params ) {
                     'active'     => 1
                 ),
             'child' => null
-            ) 
-        ) 
+            )
+        )
     );
 }
 
@@ -109,75 +115,75 @@ function civicpd_civicrm_tabs( &$tabs, $contactID ) {
 function civicpd_civicrm_pageRun( &$page ) {
     // Assign variables to the template using: $page->assign( 'varName', $varValue );
     // Get variables using: $page->getVar( 'varName' );
-    
-    
+
+
     /**
-     * PULL THE DEFAULTS FROM THE DATABASE 
-     * AND SET THE FORM FIELDS 
+     * PULL THE DEFAULTS FROM THE DATABASE
+     * AND SET THE FORM FIELDS
      * ACCORDING TO THEIR VALUES
      */
     $sql = "SELECT * FROM civi_cpd_defaults";
     $dao = CRM_Core_DAO::executeQuery($sql);
   	$arr_civi_cpd_defaults = array();
     $x = 0;
-    while( $dao->fetch( ) ) {   
+    while( $dao->fetch( ) ) {
        	$arr_civi_cpd_defaults[$dao->name] = $dao->value;
-       	$x++;	
+       	$x++;
     }
-    
+
     // SET VARIABLES FROM DEFAULTS ARRAY
     if(is_array ($arr_civi_cpd_defaults)) {
-    
+
     	if(isset($arr_civi_cpd_defaults['member_update_limit'])) {
     		$civi_cpd_member_update_limit = $arr_civi_cpd_defaults['member_update_limit'];
     	} else {
     		$civi_cpd_member_update_limit = 0;
     	}
-    	
+
     	if(isset($arr_civi_cpd_defaults['organization_member_number'])) {
     		$civi_cpd_organization_member_number_field = $arr_civi_cpd_defaults['organization_member_number'];
     	} else {
     		$civi_cpd_organization_member_number_field = 'civicrm_contact.external_identifier';
     	}
-    	
+
     	if(isset($arr_civi_cpd_defaults['long_name'])) {
     		$civi_cpd_long_name = $arr_civi_cpd_defaults['long_name'];
     	} else {
     		$civi_cpd_long_name = 'Continuing Professional Development';
     	}
-    	
+
     	if(isset($arr_civi_cpd_defaults['short_name'])) {
     		$civi_cpd_short_name = $arr_civi_cpd_defaults['short_name'];
     	} else {
     		$civi_cpd_short_name = 'CPD';
     	}
-    	
+
     } else {
     		$civi_cpd_member_update_limit = 0;
     		$civi_cpd_organization_member_number_field = 'civicrm_contact.external_identifier';
     		$civi_cpd_long_name = 'Continuing Professional Development';
     		$civi_cpd_short_name = 'CPD';
     }
-    
+
     $page->assign( 'civi_cpd_member_update_limit', $civi_cpd_member_update_limit );
     $page->assign( 'civi_cpd_organization_member_number_field', $civi_cpd_organization_member_number_field );
     $page->assign( 'civi_cpd_long_name', $civi_cpd_long_name );
     $page->assign( 'civi_cpd_short_name', $civi_cpd_short_name );
-    
-	
+
+
 	// ADD CPD INFO + LINK TO 'MY CONTACT DASHBOARD'
     if($page->getVar('_name')=='CRM_Contact_Page_View_UserDashBoard') {
-    	
+
     	$current_year = date("Y");
-		
+
 		if(!isset($_SESSION["report_year"])) {
 			$_SESSION["report_year"] = $current_year;
 		}
-    
+
     	// Find the ID of the person viewing this page
     	$session = CRM_Core_Session::singleton();
     	$contact_id = $session->get('userID');
-   
+
     	// Find the Year we are interested in and the date to print the report for
     	// Default to this year
     	$report_year = date("Y");
@@ -186,16 +192,16 @@ function civicpd_civicrm_pageRun( &$page ) {
     	$sql = "SELECT SUM(credits) as total_credits FROM civi_cpd_activities WHERE contact_id = ". $contact_id ." AND EXTRACT(YEAR FROM civi_cpd_activities.credit_date) = " . $_SESSION["report_year"];
 
     	$dao = CRM_Core_DAO::executeQuery($sql);
-    	while( $dao->fetch( ) ) {   
-        	$total_credits = abs($dao->total_credits);	
+    	while( $dao->fetch( ) ) {
+        	$total_credits = abs($dao->total_credits);
     	}
-    	
+
     	if(!isset($total_credits)) {
         	$total_credits = 0;
     	}
-	
+
 		$mcd_cpd_message = 'You currently have <strong>'. $total_credits .'</strong> ' . $civi_cpd_short_name . ' hours for 55' . $_SESSION["report_year"] . '. <a href="/civicrm/civicpd/report"><u>Click here</u></a> to update your ' . $civi_cpd_short_name . ' activities.';
-		
+
 		// IF THIS CONTACT HAS AN APPLICABLE MEMBERSHIP TYPE, INSERT THE CPD INFO IN THEIR CONTACT DASHBOARD
     	$sql = 'SELECT civi_cpd_membership_type.membership_id
 				, civicrm_membership.contact_id 
@@ -204,13 +210,13 @@ function civicpd_civicrm_pageRun( &$page ) {
 				ON civi_cpd_membership_type.membership_id = civicrm_membership.membership_type_id 
 				WHERE civicrm_membership.contact_id = ' . $contact_id;
 		$dao = CRM_Core_DAO::executeQuery($sql);
-		
+
 		if ($dao->N > 0) {
     		$page->assign( 'mcd_cpd_message', $mcd_cpd_message );
     	} else {
     		$page->assign( 'mcd_cpd_message', 'Your membership type is not associated with the ' .$civi_cpd_long_name. ' program.' );
     	}
-    
+
     }
 }
 
@@ -264,4 +270,81 @@ function civicpd_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  */
 function civicpd_civicrm_managed(&$entities) {
   return _civicpd_civix_civicrm_managed($entities);
+}
+
+//////////////////////
+// Helper Functions //
+//////////////////////
+
+function civicpd_setupPaths() {
+  $extDir = civicpd_getExtensionDir();
+  $extUrl = civicpd_getExtensionUrl();
+
+  define('CPD_DIR', $extDir);
+  define('CPD_PATH', $extUrl);
+}
+
+/**
+ * Get this extension's absolute directory path
+ *
+ * @return string
+ */
+function civicpd_getExtensionDir() {
+  $files = _civicpd_getActiveModuleFiles();
+
+  $extFile = '';
+  foreach ($files as $file) {
+    if ($file['prefix'] === 'civicpd') {
+      $extFile = $file['filePath'];
+      break;
+    }
+  }
+
+  $extDir = str_replace('civicpd.php', '', $extFile);
+
+  return $extDir;
+}
+
+/**
+ * Get this extension's absolute URL
+ *
+ * @return string
+ */
+function civicpd_getExtensionUrl() {
+  $urls = _civicpd_getActiveModuleUrls();
+
+  $url = '';
+  if (!empty($urls[CPD_EXT_NAME])) {
+    $url = $urls[CPD_EXT_NAME];
+  }
+
+  return $url;
+}
+
+/**
+ * Get an array of active module file paths
+ *
+ * @return array
+ */
+function _civicpd_getActiveModuleFiles() {
+  return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles();
+}
+
+/**
+ * Get an array of root URLs for active modules
+ *
+ * @return array
+ */
+function _civicpd_getActiveModuleUrls() {
+  $mapper = CRM_Extension_System::singleton()->getMapper();
+  $urls = array();
+  $urls['civicrm'] = $mapper->keyToUrl('civicrm');
+  foreach ($mapper->getModules() as $module) {
+    /** @var $module CRM_Core_Module */
+    if ($module->is_active) {
+      $urls[$module->name] = $mapper->keyToUrl($module->name);
+    }
+  }
+
+  return $urls;
 }
