@@ -69,8 +69,9 @@ cj(function(){
 
       var year = cj('#select_year option').filter(':selected').val();
       var cid = cj(this).data('cid');
+      var action = checkbox.prop('checked') ? 'approve' : 'disapprove';
 
-      var result = window.confirm('Please confirm that you would like to approve the activity');
+      var result = window.confirm('Please confirm that you would like to ' + action + ' the activity');
 
       if (result) {
         var handleResponse = function (response) {
@@ -79,7 +80,7 @@ cj(function(){
         };
 
         var handleSuccess = function () {
-          var msg = 'Activity ' + (checkbox.prop('checked') ? 'approved' : 'unapproved');
+          var msg = 'Activity ' + action + 'd';
 
           CRM.alert('', msg, 'success');
         };
@@ -92,7 +93,7 @@ cj(function(){
 
         cj.ajax({
           type: 'POST',
-          url: window.location.origin + '/civicrm/civicpd/fullreport?action=approve',
+          url: window.location.origin + '/civicrm/civicpd/fullreport?action=' + action,
           data: {cid: cid, year: year},
           success: handleResponse,
           error: handleError

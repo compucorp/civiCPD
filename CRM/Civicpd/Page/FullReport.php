@@ -247,19 +247,18 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
     parent::run();
   }
 
-    public function approveActivity() {
-        $year = $_SESSION['report_year'];
-
+    public function approveActivity($approved) {
         $sql
           = "
             UPDATE civi_cpd_activities
-            SET approved = 1
+            SET approved = %0
             WHERE
-            	contact_id = %0
-        	    AND YEAR(credit_date) = %1
+            	contact_id = %1
+        	    AND YEAR(credit_date) = %2
         ";
 
         $params = array(
+          array((int) $approved, 'Integer'),
           array((int) $_REQUEST['cid'], 'Integer'),
           array((int) $_REQUEST['year'], 'Integer')
         );
@@ -278,7 +277,11 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         if (isset($_REQUEST['action'])) {
             switch ($_REQUEST['action']) {
                 case 'approve':
-                    $this->approveActivity();
+                    $this->approveActivity(true);
+                    break;
+
+                case 'disapprove':
+                    $this->approveActivity(false);
                     break;
             }
         }
