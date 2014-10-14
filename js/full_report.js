@@ -68,9 +68,13 @@ cj(function(){
       var checkbox = cj(this);
       var totalHours = +checkbox.parents('tr').find('.total-credits').html();
 
+      var undoCheck = function() {
+        checkbox.prop('checked', !checkbox.prop('checked'));
+      };
+
       if (!totalHours) {
         CRM.alert('Cannot approve CPD activities for the user as there are no hours!', '', 'error', {expires: 5000});
-        checkbox.prop('checked', !checkbox.prop('checked'));
+        undoCheck();
 
         return;
       }
@@ -83,8 +87,10 @@ cj(function(){
 
       if (result) {
         var handleResponse = function (response) {
-          if (response == 0) handleError(response);
-          else if (response == 1) handleSuccess(response);
+          response = JSON.parse(response);
+
+          if (response.status === 1) handleSuccess(response);
+          else handleError(response);
         };
 
         var handleSuccess = function () {
@@ -93,10 +99,10 @@ cj(function(){
           CRM.alert('', msg, 'success');
         };
 
-        var handleError = function () {
-          CRM.alert('Please refresh the page and try again', 'Oops! There was a problem', 'error');
+        var handleError = function (response) {
+          CRM.alert(response['error_msg'], 'Oops! There was a problem', 'error');
 
-          checkbox.prop('checked', !checkbox.prop('checked'));
+          undoCheck();
         };
 
         cj.ajax({
@@ -106,8 +112,9 @@ cj(function(){
           success: handleResponse,
           error: handleError
         });
+      } else {
+        undoCheck();
       }
-
    });
 			
 });

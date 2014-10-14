@@ -267,9 +267,9 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
 
         try {
             CRM_Core_DAO::executeQuery($sql, $params);
-            echo 1;
+            echo json_encode(array('status' => 1));
         } catch (Exception $e) {
-            echo 0;
+            echo json_encode(array('status' => 0, 'error_msg' => $e->getMessage()));
         }
 
         exit;
@@ -288,6 +288,4 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
             }
         }
     }
-
-
 }
