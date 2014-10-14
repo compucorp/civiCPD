@@ -73,39 +73,52 @@ height: 200px;
 clear:both;}
  
 .graphcont {
-margin: -60px 60%;
-color:#000;
-font-weight:700;
-float:right;
+    color: #000;
+    font-weight: 700;
+    margin: 0 0 2rem;
 }
- 
+
 .graph {
-float:left;
-margin-top:10px;
 background-color:#cecece;
 position:relative;
-width:280px;
 padding:0
 }
- 
+
 .graph .bar {
-display:block;
-position:relative;
-background-color:#14CC21;
-background-position:right center;
-background-repeat:repeat-x;
-border-right:#538e02 1px solid;
-text-align:center;
-color:#fff;
-height:25px;
-font-family:Arial, Helvetica, sans-serif;
-font-size:12px;
-line-height:1.9em
+    display: block;
+    position: relative;
+    text-align: center;
+    color: #fff;
+    height: 25px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 2;
+    box-shadow: 1px 0px 5px rgba(100, 100, 100, 0.75);
 }
  
 .graph .bar span {
 position:absolute;
 left:1em
+}
+
+.graph .marker {
+    display: block;
+    border-right: 2px solid #cecece;
+    position: absolute;
+    height: 25px;
+    top: 25px;
+    margin-left: -2px;
+    color: darkgreen;
+}
+
+.graph .marker span {
+    position: absolute;
+    right: 5px;
+    bottom: -4px;
+    color: #aaa;
+    text-align: right;
+    display: block;
+    min-width: 5rem;
 }
 
 .fileUpload {

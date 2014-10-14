@@ -10,6 +10,7 @@
 require_once 'CRM/Core/Page.php';
 
 class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
+    static public $totalCredits = 0;
   
     function run() {
         
@@ -71,6 +72,14 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
         civi_cpd_report_unset_session();
 
         parent::run();
+    }
+
+    public static function incrementTotalCredits($credits) {
+        static::$totalCredits += (int) $credits;
+    }
+
+    public static function getTotalCredits() {
+        return static::$totalCredits;
     }
 
     static public function getApprovalStatus($cid) {
@@ -145,7 +154,30 @@ function civi_cpd_report_get_category($dao, $i) {
 
     return $category;
 }
-    
+
+function civi_cpd_report_get_progress() {
+    $credits = CRM_Civicpd_Page_CPDReport::getTotalCredits();
+    $progressPercentage = 100 * $credits / CPD_MAX_CREDITS;
+    $minPercentage = 100 * CPD_MIN_CREDITS / CPD_MAX_CREDITS;
+    $color = $progressPercentage < $minPercentage ? 'red' : 'green';
+
+    $progress =
+       '<tr valign="top">
+          <td height="18">
+            <div class="graphcont">
+              <div class="graph">
+                <strong class="bar" style="width: ' . $progressPercentage . '%; background: ' . $color .'">' . $credits . ' h</strong>
+                <span class="marker" style="width: ' .$minPercentage . '%;"><span>Target ' . CPD_MIN_CREDITS . ' h</span></span>
+                <span class="marker" style="width: 100%;"><span>' . CPD_MAX_CREDITS . ' h</span></span>
+              </div>
+            </div>
+            <div class="clear"></div>
+          </td>
+       </tr>';
+
+    return $progress;
+}
+
 function civi_cpd_report_get_activity_table($category_id) {
     $sql = "SELECT civi_cpd_categories.category
         , civi_cpd_activities.id AS activity_id
@@ -475,9 +507,11 @@ function civi_cpd_report_import_activity_pdf() {
 }
 
 function civi_cpd_report_get_uploaded_activity_list($user_id) {
-    $pdf_upload_table = '<h3>Upload Activity from PDF: </h3>'
+    $pdf_upload_table = '<h3>Upload full CPD record:</h3>'
+        . '<p>If you have already recorded your CPD in a different format you can upload it in
+pdf format here.</p>'
         . '<div class="upload-activity-buttons">'
-        . '<a class="upload-new-activity-item" href="#"">New</a></div>'    
+        . '<a class="upload-new-activity-item" href="#"">Add new CPD activity</a></div>'
         .  civi_cpd_report_get_pdf_import($user_id)   
         . '<p><em>' . civi_cpd_report_get_activity_upload_response() . '</em></p>';
     
@@ -789,8 +823,9 @@ function civi_crm_report_get_content() {
    $content = '';
    $i = 1;
 
-   while ($dao->fetch()) {  
-       $content .= civi_cpd_report_get_category($dao, $i);
+   while ($dao->fetch()) {
+       CRM_Civicpd_Page_CPDReport::incrementTotalCredits($dao->credits);
+
        $content .= civi_cpd_report_get_activity_table($dao->id);
        $content .= civi_cpd_report_get_add_activity_table($dao->id);
        $content .= civi_cpd_report_get_editable_activity($dao->id);
@@ -798,6 +833,8 @@ function civi_crm_report_get_content() {
        $content	.= '</td></tr><tr valign="top"><td>&nbsp;</td></tr>';
        $i++;
    }
+
+   $content = civi_cpd_report_get_progress() . $content;
 
    return $content;
 }
