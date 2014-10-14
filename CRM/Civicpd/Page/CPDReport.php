@@ -65,12 +65,43 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
         $this->assign('total_credits', civi_cpd_report_get_total_credits());
         $this->assign('uploaded_activity_list', civi_cpd_report_get_uploaded_activity_list(
             $session->get('userID')));
-        $this->assign('approved', civi_cpd_report_get_approval_status());
+        $this->assign('approved', static::getApprovalStatus(civi_cpd_report_get_contact_id()));
         $this->assign('imageUrl', CPD_PATH . '/assets/approved.png');
 
         civi_cpd_report_unset_session();
 
         parent::run();
+    }
+
+    static public function getApprovalStatus($cid) {
+        $sql
+          = "
+            SELECT a.approved
+            FROM civi_cpd_activities a
+            WHERE
+                a.contact_id = %0
+           	    AND YEAR(a.credit_date) = %1
+        ";
+
+        $params = array(
+          array((int) $cid, 'Integer'),
+          array((int) $_SESSION['report_year'], 'Integer')
+        );
+
+        $dao = CRM_Core_DAO::executeQuery($sql, $params);
+
+        $total = $approved = 0;
+        while ($dao->fetch()) {
+            if ($dao->approved) {
+                $approved++;
+            }
+
+            $total++;
+        }
+
+        $dao->free();
+
+        return ($total && $total == $approved);
     }
 }
 
@@ -781,35 +812,4 @@ function civi_cpd_report_validate_number($var) {
     if (is_numeric($var)) {
         return TRUE;
     }
-}
-
-function civi_cpd_report_get_approval_status() {
-    $sql
-      = "
-        SELECT a.approved
-        FROM civi_cpd_activities a
-        WHERE
-            a.contact_id = %0
-       	    AND YEAR(a.credit_date) = %1
-    ";
-
-    $params = array(
-      array((int) civi_cpd_report_get_contact_id(), 'Integer'),
-      array((int) $_SESSION['report_year'], 'Integer')
-    );
-
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-
-    $total = $approved = 0;
-    while ($dao->fetch()) {
-        if ($dao->approved) {
-            $approved++;
-        }
-
-        $total++;
-    }
-
-    $dao->free();
-
-    return ($total && $total == $approved);
 }

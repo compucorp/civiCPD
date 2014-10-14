@@ -168,7 +168,9 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
 
                 $last_contact_id = $dao->id;
                 $report_table .= '<tr>';
-                $report_table .= '<td><input class="approve" type="checkbox" data-cid="' . $dao->id . '"/></td>';
+                $report_table .= '<td><input class="approve" type="checkbox"';
+                $report_table .= CRM_Civicpd_Page_CPDReport::getApprovalStatus($dao->id) ? ' checked="checked" ' : ' ';
+                $report_table .= 'data-cid="' . $dao->id . '"/></td>';
                 $report_table .= '<td><a href="/civicrm/contact/view?cid=' . $dao->id . '">' . $dao->last_name . '</a></td>';
                 $report_table .= '<td>' . $dao->first_name . '</td>';
                 $csv_output .= $dao->last_name . ', ' . $dao->first_name . ', ';
@@ -225,7 +227,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 }
 
                 $report_table .= '</td>';
-                $report_table .= '<td>' . $total_credits . '</td>';
+                $report_table .= '<td class="total-credits">' . $total_credits . '</td>';
                 $report_table .= $sub_cells;
                 $report_table .= '</tr>';
                 $csv_output .= $total_credits . "\n";

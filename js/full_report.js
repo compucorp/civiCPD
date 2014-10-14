@@ -66,12 +66,20 @@ cj(function(){
 
     cj('.approve').on('click', function () {
       var checkbox = cj(this);
+      var totalHours = +checkbox.parents('tr').find('.total-credits').html();
+
+      if (!totalHours) {
+        CRM.alert('Cannot approve CPD activities for the user as there are no hours!', '', 'error', {expires: 5000});
+        checkbox.prop('checked', !checkbox.prop('checked'));
+
+        return;
+      }
 
       var year = cj('#select_year option').filter(':selected').val();
       var cid = cj(this).data('cid');
       var action = checkbox.prop('checked') ? 'approve' : 'disapprove';
 
-      var result = window.confirm('Please confirm that you would like to ' + action + ' the activity');
+      var result = window.confirm('Please confirm that you would like to ' + action + ' CPD actitivies for the user');
 
       if (result) {
         var handleResponse = function (response) {
