@@ -25,9 +25,10 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
 
         if(isset($_GET['action']) || isset($_POST['action'])) {
             switch ($_REQUEST['action']) {
-                case 'import':
-                    civi_cpd_report_import_activity();
-                break;
+                /** Import by CSV is no longer needed */
+//                case 'import':
+//                    civi_cpd_report_import_activity();
+//                break;
                 case 'import-pdf':
                     civi_cpd_report_import_activity_pdf();
                 break;
@@ -50,6 +51,10 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
                 
                 case 'delete':
                     civi_cpd_report_delete_activity();
+                    break;
+
+                case 'delete_evidence':
+                    civi_cpd_report_delete_evidence_pdf();
                     break;
             }
         }
@@ -208,7 +213,8 @@ function civi_cpd_report_get_activity_table($category_id) {
         , civi_cpd_activities.credits
         , civi_cpd_activities.activity
         , civi_cpd_activities.notes 
-        FROM civi_cpd_categories 
+        , civi_cpd_activities.evidence
+        FROM civi_cpd_categories
         INNER JOIN civi_cpd_activities 
         ON civi_cpd_categories.id = civi_cpd_activities.category_id 
         WHERE civi_cpd_activities.category_id = " . $category_id . " 
@@ -221,8 +227,8 @@ function civi_cpd_report_get_activity_table($category_id) {
     $activity_table = '<div id="category-' . $category_id . '" class="activity-list">' . 
         civi_cpd_report_get_edit_activity_response($category_id) . 
         '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>' .
-        '<th width="15%">Date</th><th width="10%">Hours</th><th width="20%">Activity</th>' .
-        '<th width="40%">Reflection</th><th width="10%">Action</th></tr>';
+        '<th width="15%">Date</th><th width="5%">Hours</th><th width="15%">Activity</th>' .
+        '<th width="35%">Reflection</th><th width="15">Evidence</th><th width="15%">Action</th></tr>';
 
     if ($dao->N > 0) {
         while ($dao->fetch()) { 
@@ -238,7 +244,7 @@ function civi_cpd_report_get_activity_table($category_id) {
 
 function civi_cpd_report_get_manual_import($category_id) {
     $manual_import = '<div class="activity-item-manual">
-        <form  method="post" action="/civicrm/civicpd/report">
+        <form  method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data">
             <input type="hidden" value="insert" name="action">
             <input type="hidden" value="'. $category_id .'" name="category_id">
             <table height="180px" width="50%" cellspacing="0" cellpadding="0" border="0" align="center">
@@ -250,18 +256,22 @@ function civi_cpd_report_get_manual_import($category_id) {
                                 civi_cpd_report_get_date() . '></td>
                     </tr>
                     <tr>
-                            <td width="5%" valign="top" nowrap="nowrap">Activity:</td>
+                            <td width="5%" valign="top" nowrap="nowrap">Title of activity:</td>
                             <td width="60%"><input type="text" size="30" class="frm" ' . 
                                 'name="activity"></td>
                     </tr>
-                            <td width="5%" valign="top">Hours:</td>
+                            <td width="5%" valign="top">Number of hours:</td>
                             <td width="60%"><input type="text" maxlength="4" size="30" ' . 
                                 'class="frm" name="credits"></td>
                     </tr>
                     <tr>
-                            <td width="5%" valign="top" nowrap="nowrap">Reflection:</td>
+                            <td width="5%" valign="top" nowrap="nowrap">Notes and reflection on activity:</td>
                             <td width="60%"><textarea class="frm" rows="4" cols="39" ' . 
                                 'name="notes"></textarea></td>
+                    </tr>
+                    <tr>
+                            <td>Evidence</td>
+                            <td><input type="file" name="evidence" id="evidence"></td>
                     </tr>
                     <tr>
                             <td align="center"><input class="validate form-submit ' . 
@@ -369,9 +379,10 @@ function civi_cpd_report_delete_activity() {
             civi_cpd_report_set_activity_upload_response('delete', FALSE);
         }
     } elseif(isset($_GET['activity_id']) && isset($_GET['category_id'])) {
-        $sql = "DELETE FROM civi_cpd_activities WHERE id =" . $_GET['activity_id'];
-        CRM_Core_DAO::executeQuery($sql);
-        civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'], 
+        civi_cpd_report_delete_evidence_pdf();
+
+        CRM_Core_DAO::executeQuery("DELETE FROM civi_cpd_activities WHERE id =" . $_GET['activity_id']);
+        civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'],
             TRUE);
     } else {
         civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'], 
@@ -534,6 +545,56 @@ function civi_cpd_report_import_activity_pdf() {
     } 
 }
 
+/**
+ * Upload an evidence document set in the POST request and return its file name
+ *
+ * @return null|string
+ */
+function civi_cpd_report_import_activity_evidence_pdf() {
+    $fileName = null;
+
+    if (isset($_FILES["evidence"])
+      && strtolower($_FILES['evidence']['type']) == 'application/pdf'
+      && isset($_POST['category_id'])) {
+        $fileName = date('Y-m-d-s') . '-'  . $_POST['category_id'] . '-' . civi_cpd_report_get_contact_id() . '.pdf';
+        $path = civi_cpd_report_get_evidence_pdf_path($fileName);
+        $fileName = move_uploaded_file($_FILES['evidence']['tmp_name'], $path)
+          ? $fileName
+          : null;
+    }
+
+    return $fileName;
+}
+
+/**
+ * Delete an evidence document corresponding to an activity with ID set in the GET request
+ */
+function civi_cpd_report_delete_evidence_pdf() {
+    $activityId = $_GET['activity_id'];
+
+    $fileName = NULL;
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT evidence FROM civi_cpd_activities WHERE id = ' . $activityId);
+    $dao->fetch();
+
+    if ($fileName = $dao->evidence) {
+        $absoluteFilePath = civi_cpd_report_get_evidence_pdf_path($fileName);
+
+        if (file_exists($absoluteFilePath)) {
+            unlink($absoluteFilePath);
+            CRM_Core_DAO::executeQuery('UPDATE civi_cpd_activities SET evidence = NULL WHERE id = ' . $activityId);
+        }
+    }
+}
+
+function civi_cpd_report_get_evidence_pdf_path($fileName) {
+    return CPD_DIR . 'uploads/evidence/' . $fileName;
+}
+
+function civi_cpd_report_get_evidence_pdf_url($fileName) {
+    return CPD_PATH . '/uploads/evidence/' . $fileName;
+}
+
 function civi_cpd_report_get_uploaded_activity_list($user_id) {
     $pdf_upload_table = '<h3>Upload full CPD record:</h3>'
         . '<p>If you have already recorded your CPD in a different format you can upload it in
@@ -580,71 +641,114 @@ pdf format here.</p>'
     return $pdf_upload_table;
 }
 
-function civi_cpd_report_import_activity() {
-    if (isset($_FILES["file"]) && strtolower($_FILES['file']['type']) == 'text/csv') {       
-        $filename = $_FILES['file']['tmp_name'];
-        $handle = fopen($filename, "r");
-        $row = 0;		
-        $error = FALSE;
-        $sql = 'INSERT INTO civi_cpd_activities(contact_id, category_id, credit_date, ' . 
-            'credits, activity, notes) VALUES';
-        
-        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE && !$error) {	
-            $row++;
-            if($row > 1 && !empty($data[0]) &&  !empty($data[1]) && !empty($data[2]) && !empty($data[3])) {
-                if (civi_cpd_report_validate_date($data[0]) &&  civi_cpd_report_validate_number($data[1])) {
-
-                    $category_id = $_POST['category_id'];
-                    $credit_date = $data[0];
-                    $credits     = number_format($data[1], 2, '.', '');
-                    $activity    = mysql_real_escape_string($data[2]);
-                    $notes       = mysql_real_escape_string($data[3]);      
-
-                    $sql .= "(" . civi_cpd_report_get_contact_id() . "," . $category_id . 
-                        ",'" . $credit_date . "'," . $credits . ",'" . $activity . 
-                        "','" . $notes . "'),";
-                } else {
-                    $error = TRUE;
-                }
-            }
-        }
-        if ($error) {
-            civi_cpd_report_set_add_activity_response('csv', $category_id, FALSE);
-        } else {
-            $sql = substr($sql, 0, -1) . ';';
-            CRM_Core_DAO::executeQuery($sql);
-            fclose($handle);
-            civi_cpd_report_set_add_activity_response('csv', $category_id, TRUE);
-        }
-     } else {
-         civi_cpd_report_set_add_activity_response('csv', $category_id, FALSE);
-     }
-}
+/**
+ * CSV import no longer being used
+ */
+//function civi_cpd_report_import_activity() {
+//    if (isset($_FILES["file"]) && strtolower($_FILES['file']['type']) == 'text/csv') {
+//        $filename = $_FILES['file']['tmp_name'];
+//        $handle = fopen($filename, "r");
+//        $row = 0;
+//        $error = FALSE;
+//        $sql = 'INSERT INTO civi_cpd_activities(contact_id, category_id, credit_date, ' .
+//            'credits, activity, notes) VALUES';
+//
+//        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE && !$error) {
+//            $row++;
+//            if($row > 1 && !empty($data[0]) &&  !empty($data[1]) && !empty($data[2]) && !empty($data[3])) {
+//                if (civi_cpd_report_validate_date($data[0]) &&  civi_cpd_report_validate_number($data[1])) {
+//
+//                    $category_id = $_POST['category_id'];
+//                    $credit_date = $data[0];
+//                    $credits     = number_format($data[1], 2, '.', '');
+//                    $activity    = mysql_real_escape_string($data[2]);
+//                    $notes       = mysql_real_escape_string($data[3]);
+//
+//                    $sql .= "(" . civi_cpd_report_get_contact_id() . "," . $category_id .
+//                        ",'" . $credit_date . "'," . $credits . ",'" . $activity .
+//                        "','" . $notes . "'),";
+//                } else {
+//                    $error = TRUE;
+//                }
+//            }
+//        }
+//        if ($error) {
+//            civi_cpd_report_set_add_activity_response('csv', $category_id, FALSE);
+//        } else {
+//            $sql = substr($sql, 0, -1) . ';';
+//            CRM_Core_DAO::executeQuery($sql);
+//            fclose($handle);
+//            civi_cpd_report_set_add_activity_response('csv', $category_id, TRUE);
+//        }
+//     } else {
+//         civi_cpd_report_set_add_activity_response('csv', $category_id, FALSE);
+//     }
+//}
 
 function civi_cpd_report_insert_activity()  {
-    if(!empty($_POST['category_id']) && civi_cpd_report_validate_date($_POST['credit_date']) &&  civi_cpd_report_validate_number($_POST['credits']) && !empty($_POST['notes']) && !empty($_POST['activity'])) {        
-        $sql = "INSERT INTO civi_cpd_activities(contact_id, category_id, credit_date, " . 
-            "credits, activity, notes) VALUES('" . civi_cpd_report_get_contact_id() . 
-            "','" . $_POST['category_id'] . "','" . $_POST['credit_date'] . "','" . 
-            number_format($_POST['credits'], 2, '.', '') . "','" . $_POST['activity'] . "','" . 
-            $_POST['notes'] . "')";
+    if(!empty($_POST['category_id'])
+      && civi_cpd_report_validate_date($_POST['credit_date'])
+      && civi_cpd_report_validate_number($_POST['credits'])
+      && !empty($_POST['notes'])
+      && !empty($_POST['activity'])) {
+        $contactId = civi_cpd_report_get_contact_id();
+        $categoryId = $_POST['category_id'];
+        $creditDate = $_POST['credit_date'];
+        $credits = number_format($_POST['credits'], 2, '.', '');
+        $activity = $_POST['activity'];
+        $notes = $_POST['notes'];
+        $evidenceFileName = civi_cpd_report_import_activity_evidence_pdf();
+
+        $sql = "
+            INSERT INTO civi_cpd_activities
+            (
+                contact_id,
+                category_id,
+                credit_date,
+                credits,
+                activity,
+                notes,
+                evidence
+            )
+            VALUES(
+               '$contactId',
+               '$categoryId',
+               '$creditDate',
+               '$credits',
+               '$activity',
+               '$notes',
+               '$evidenceFileName'
+            )";
 
         CRM_Core_DAO::executeQuery($sql);
-        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], 
+        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'],
             TRUE);
     } else {
         civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], 
             FALSE);
     }
-    
 }
 
 function civi_cpd_report_update_activity() {
-    if(!empty($_POST['activity_id']) && !empty($_POST['category_id']) && civi_cpd_report_validate_date($_POST['credit_date']) &&  civi_cpd_report_validate_number($_POST['credits']) && !empty($_POST['notes']) && !empty($_POST['activity'])) {        
-        $sql = "UPDATE civi_cpd_activities SET credit_date = '" . $_POST['credit_date'] . 
-            "', " . "credits = " . number_format($_POST['credits'], 2, '.', '') . 
-            ", activity = '" . $_POST['activity'] . "', notes = '" . $_POST['notes'] . "' " . 
-            "WHERE id =" . $_POST['activity_id'];
+    if(!empty($_POST['activity_id']) && !empty($_POST['category_id']) && civi_cpd_report_validate_date($_POST['credit_date']) &&  civi_cpd_report_validate_number($_POST['credits']) && !empty($_POST['notes']) && !empty($_POST['activity'])) {
+        $activityId = $_POST['activity_id'];
+        $creditDate = $_POST['credit_date'];
+        $credits = number_format($_POST['credits'], 2, '.', '');
+        $activity = $_POST['activity'];
+        $notes = $_POST['notes'];
+        $evidence = civi_cpd_report_import_activity_evidence_pdf();
+
+        $sql = "
+            UPDATE civi_cpd_activities
+
+            SET
+                credit_date = '$creditDate',
+                credits = '$credits',
+                activity = '$activity',
+                notes = '$notes',
+                evidence = '$evidence'
+
+            WHERE id = $activityId";
 
          CRM_Core_DAO::executeQuery($sql); 
          civi_cpd_report_set_edit_activity_response('update', $_POST['category_id'], 
@@ -671,19 +775,42 @@ function civi_cpd_report_set_editable_activity() {
     $activity_id = $_GET['activity_id'];
 
     if(isset($activity_id)) {
-        $sql = "SELECT civi_cpd_categories.id AS id, civi_cpd_categories.category, " . 
-            "civi_cpd_activities.credit_date, civi_cpd_activities.credits, " . 
-            "civi_cpd_activities.activity, civi_cpd_activities.notes " .
-            "FROM civi_cpd_activities INNER JOIN civi_cpd_categories ON " . 
-            "civi_cpd_categories.id = civi_cpd_activities.category_id " .
-            "WHERE civi_cpd_activities.id = $activity_id";
+        $sql = "
+            SELECT
+                civi_cpd_categories.id AS id,
+                civi_cpd_categories.category,
+                civi_cpd_activities.id AS activity_id,
+                civi_cpd_activities.credit_date,
+                civi_cpd_activities.credits,
+                civi_cpd_activities.activity,
+                civi_cpd_activities.notes,
+                civi_cpd_activities.evidence
+
+            FROM civi_cpd_activities
+
+            INNER JOIN civi_cpd_categories
+            ON civi_cpd_categories.id = civi_cpd_activities.category_id
+
+            WHERE civi_cpd_activities.id = $activity_id";
 
         $dao = CRM_Core_DAO::executeQuery($sql);   					
         $dao->fetch();
+
+        $evidenceHtml = null;
+        if ($dao->evidence) {
+           $evidenceUrl = civi_cpd_report_get_evidence_pdf_url($dao->evidence);
+
+           $evidenceHtml = '<a target="_blank" href="' . $evidenceUrl . '">View</a> | ';
+           $evidenceHtml .= '<a href="/civicrm/civicpd/report?action=delete_evidence&activity_id=' .
+                       $dao->activity_id . '">delete</a>';
+        } else {
+            $evidenceHtml = '<input type="file" name="evidence" id="evidence">';
+        }
+
         $_SESSION['civi_crm_report']['edit_activity_category_id'] = $dao->id;
         $_SESSION['civi_crm_report']['edit_activity'] = '<div class="update-activity">
-            <form method="post" action="/civicrm/civicpd/report?action=update&id=' . 
-                $activity_id . '">
+            <form method="post" action="/civicrm/civicpd/report?action=update&id=' . $activity_id . '"
+                enctype="multipart/form-data">
                 <input type="hidden" value="update" name="action">
                 <input type="hidden" value="'. $dao->id .'" name="category_id">
                 <input type="hidden" value="'. $activity_id .'" name="activity_id">
@@ -710,6 +837,10 @@ function civi_cpd_report_set_editable_activity() {
                             <td width="5%" valign="top" nowrap="nowrap">Reflection:</td>
                             <td width="60%"><textarea class="frm" rows="4" cols="39" ' . 
                             'name="notes">' . $dao->notes . '</textarea></td>
+                        </tr>
+                        <tr>
+                            <td width="5%" valign="top" nowrap="nowrap">Evidence:</td>
+                            <td width="60%">' . $evidenceHtml . '</td>
                         </tr>
                         <tr>
                             <td colspan="2">
@@ -812,12 +943,17 @@ function civi_cpd_report_no_activities_action() {
  }
  
  function civi_cpd_report_get_activities_list($dao) {
-    $activity_list = '<tr>' .
-    '<td width="10%" valign="top">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>' .
-    '<td width="10%" valign="top">' . abs($dao->credits) . '</td>' .
-    '<td width="20%" valign="top">' . $dao->activity . '</td>' .
-    '<td width="40%" valign="top">' . $dao->notes . '</td>' .
-    '<td width="10%" valign="top"">';
+    $activity_list = '<tr>';
+    $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
+    $activity_list .= '<td valign="top">' . abs($dao->credits) . '</td>';
+    $activity_list .= '<td valign="top">' . $dao->activity . '</td>';
+    $activity_list .= '<td valign="top">' . $dao->notes . '</td>';
+    $activity_list .= '<td valign="top"">';
+    $activity_list .= $dao->evidence
+      ? '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>'
+      : '';
+    $activity_list .= '</td>';
+    $activity_list .= '<td valign="top"">';
 
     $member_update_limit = civi_crm_report_get_member_update_limit();
 
