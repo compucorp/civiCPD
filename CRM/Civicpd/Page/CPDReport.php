@@ -126,23 +126,18 @@ function civi_cpd_report_download_pdf_activity() {
     }
 }
 
-function civi_cpd_report_get_category($dao, $i) {
+function civi_cpd_report_get_category($dao) {
     $pluspercent = (int)(($dao->credits / $dao->minimum) * 100);
     $category = '<tr valign="top">
-    <td height="18"><span class="CE">' . $i . '. ' . $dao->category . '</span><br/>	
-        <strong>' . abs($dao->credits) . ' hours </strong><br/>
-        (target ' . abs($dao->minimum) . ' hours)
-        <br/>' .  $dao->description . '                   
-        <div class="rating"><div class="graphcont"><div class="graph"><strong ' . 
-            'class="bar" style="width:' . $pluspercent . '%;">' . $pluspercent . 
-            '%</strong></div></div>
-        </div>
-        <div class="clear"></div>
+    <td height="18">
+      <h1>' . $dao->category . ': Total hours recorded: ' . $dao->credits . 'h</h1>'
+      . '<p>' . $dao->description . '</p>'
+      . '<div class="clear"></div>
     </td>
     </tr>
     <tr valign="top">
         <td><!-- put in buttons for add edit view -->
-            <div class="edit-activity-buttons"> <a href="#" class="show-activity-list"' . 
+            <div class="edit-activity-buttons"> <a href="#" class="show-activity-list"' .
                 ' id="category-' . $dao->id . '">Show</a>';
 
     $member_update_limit = civi_crm_report_get_member_update_limit();
@@ -154,6 +149,34 @@ function civi_cpd_report_get_category($dao, $i) {
 
     return $category;
 }
+//function civi_cpd_report_get_category($dao, $i) {
+//    $pluspercent = (int)(($dao->credits / $dao->minimum) * 100);
+//    $category = '<tr valign="top">
+//    <td height="18"><span class="CE">' . $i . '. ' . $dao->category . '</span><br/>
+//        <strong>' . abs($dao->credits) . ' hours </strong><br/>
+//        (target ' . abs($dao->minimum) . ' hours)
+//        <br/>' .  $dao->description . '
+//        <div class="rating"><div class="graphcont"><div class="graph"><strong ' .
+//            'class="bar" style="width:' . $pluspercent . '%;">' . $pluspercent .
+//            '%</strong></div></div>
+//        </div>
+//        <div class="clear"></div>
+//    </td>
+//    </tr>
+//    <tr valign="top">
+//        <td><!-- put in buttons for add edit view -->
+//            <div class="edit-activity-buttons"> <a href="#" class="show-activity-list"' .
+//                ' id="category-' . $dao->id . '">Show</a>';
+//
+//    $member_update_limit = civi_crm_report_get_member_update_limit();
+//
+//    if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit==0) {
+//        $category .= ' | <a class="new-activity-item" href="#" id="category-' .
+//            $dao->id . '">New</a></div>';
+//    }
+//
+//    return $category;
+//}
 
 function civi_cpd_report_get_progress() {
     $credits = CRM_Civicpd_Page_CPDReport::getTotalCredits();
@@ -215,8 +238,6 @@ function civi_cpd_report_get_activity_table($category_id) {
 
 function civi_cpd_report_get_manual_import($category_id) {
     $manual_import = '<div class="activity-item-manual">
-        <p><em>Import Manually: ' . civi_cpd_report_get_add_activity_response('manual', 
-            $category_id) . '</em></p>
         <form  method="post" action="/civicrm/civicpd/report">
             <input type="hidden" value="insert" name="action">
             <input type="hidden" value="'. $category_id .'" name="category_id">
@@ -308,12 +329,19 @@ function civi_cpd_report_get_pdf_import($user_id) {
 
 function civi_cpd_report_get_add_activity_table($category_id) {
     $manual_import = civi_cpd_report_get_manual_import($category_id);
-    $csv_import = civi_cpd_report_get_csv_import($category_id);
-    $import = '<div class="activity-item" id="category-' . $category_id . '">' . 
-        $manual_import . $csv_import . '</div>';
+    $import = '<div class="activity-item" id="category-' . $category_id . '">' .
+        $manual_import . '</div>';
 
     return $import;
 }
+//function civi_cpd_report_get_add_activity_table($category_id) {
+//    $manual_import = civi_cpd_report_get_manual_import($category_id);
+//    $csv_import = civi_cpd_report_get_csv_import($category_id);
+//    $import = '<div class="activity-item" id="category-' . $category_id . '">' .
+//        $manual_import . $csv_import . '</div>';
+//
+//    return $import;
+//}
 
 function civi_cpd_report_get_total_credits() {
     $sql = "SELECT SUM(credits) as total_credits 
@@ -826,6 +854,7 @@ function civi_crm_report_get_content() {
    while ($dao->fetch()) {
        CRM_Civicpd_Page_CPDReport::incrementTotalCredits($dao->credits);
 
+       $content .= civi_cpd_report_get_category($dao);
        $content .= civi_cpd_report_get_activity_table($dao->id);
        $content .= civi_cpd_report_get_add_activity_table($dao->id);
        $content .= civi_cpd_report_get_editable_activity($dao->id);
