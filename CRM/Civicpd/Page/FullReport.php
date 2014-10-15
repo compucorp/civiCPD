@@ -131,23 +131,34 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
 
     $csv_hdr .= 'Total Hours';
     $report_table .= '</tr>';
-    $sql = "SELECT civicrm_contact.id" .
-        ", civicrm_contact.last_name" .
-        ", civicrm_contact.first_name" .
-        ", civicrm_contact.external_identifier" .
-        ", civicrm_contact.user_unique_id" .
-        ", civicrm_membership.membership_type_id" .
-        ", civicrm_membership.id AS membership_id" .
-        ", civicrm_membership.join_date AS member_since" .
-        ", civicrm_membership_type.name AS member_type " .
-        "FROM civicrm_contact " .
-        "INNER JOIN civicrm_membership " .
-        "ON civicrm_contact.id = civicrm_membership.contact_id " .
-        "INNER JOIN civicrm_membership_type " .
-        "ON civicrm_membership.membership_type_id = civicrm_membership_type.id " .
-        "WHERE civicrm_contact.first_name IS NOT NULL " .
-        "AND civicrm_contact.last_name IS NOT NULL " .
-        "ORDER BY civicrm_contact.last_name";
+    $sql = "
+        SELECT civicrm_contact.id,
+            civicrm_contact.last_name,
+            civicrm_contact.first_name,
+            civicrm_contact.external_identifier,
+            civicrm_contact.user_unique_id,
+            civicrm_membership.membership_type_id,
+            civicrm_membership.id AS membership_id,
+            civicrm_membership.join_date AS member_since,
+            civicrm_membership_type.name AS member_type
+
+        FROM civicrm_contact
+
+        INNER JOIN civicrm_membership
+            ON civicrm_contact.id = civicrm_membership.contact_id
+
+        INNER JOIN civicrm_membership_type
+            ON civicrm_membership.membership_type_id = civicrm_membership_type.id
+
+        LEFT JOIN civicrm_membership_status
+            ON civicrm_membership_status.id = civicrm_membership.status_id
+
+        WHERE
+            civicrm_contact.first_name IS NOT NULL
+            AND civicrm_contact.last_name IS NOT NULL
+            AND civicrm_membership_status.name <> 'Expired'
+
+        ORDER BY civicrm_contact.last_name";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $last_contact_id = "";
