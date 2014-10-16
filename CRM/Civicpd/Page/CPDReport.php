@@ -270,7 +270,7 @@ function civi_cpd_report_get_manual_import($category_id) {
                                 'name="notes"></textarea></td>
                     </tr>
                     <tr>
-                            <td>Evidence</td>
+                            <td>Evidence (optional):</td>
                             <td><input type="file" name="evidence" id="evidence"></td>
                     </tr>
                     <tr>
@@ -839,7 +839,7 @@ function civi_cpd_report_set_editable_activity() {
                             'name="notes">' . $dao->notes . '</textarea></td>
                         </tr>
                         <tr>
-                            <td width="5%" valign="top" nowrap="nowrap">Evidence:</td>
+                            <td width="5%" valign="top" nowrap="nowrap">Evidence (optional):</td>
                             <td width="60%">' . $evidenceHtml . '</td>
                         </tr>
                         <tr>
