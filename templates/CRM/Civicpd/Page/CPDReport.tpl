@@ -14,11 +14,11 @@
             {$output}
 
     <tr valign="top">
-      <td height="18" colspan="7">{$civi_cpd_short_name} hours for activities undertaken 
+      <td colspan="7">{$civi_cpd_short_name} hours for activities undertaken
         in the calendar year {$smarty.session.report_year}: <strong>{$total_credits}</strong></td>
     </tr>
     <tr valign="top">
-      <td nowrap="" height="18">
+      <td nowrap="">
         <table width="100%" cellspacing="0" cellpadding="0" border="0">
           <tbody>
             <tr>
@@ -33,10 +33,10 @@
       </td>
     </tr>
     <tr valign="top">
-      <td nowrap="" height="18">{$uploaded_activity_list}</td>
+      <td>{$uploaded_activity_list}</td>
     </tr>
     <tr valign="top">
-      <td nowrap="" height="18">&nbsp;</td>
+      <td>&nbsp;</td>
     </tr>
   </tbody>
 </table>
@@ -46,6 +46,51 @@
     <div class="ui-progressbar-value ui-widget-header ui-corner-left ui-corner-right" style="display: block; width: 20em; height: 1em;"></div>
 </div>
 
+
+<div class="activity-item" title="Add new activity record">
+    <div class="activity-item-manual">
+        <form method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data">
+            <input type="hidden" value="insert" name="action">
+            <input type="hidden" value="" id="manual-import-category-id" name="category_id">
+            <table width="50%" cellspacing="0" cellpadding="0" border="0" align="center">
+                <tbody>
+                <tr>
+                    <td width="5%" valign="top" nowrap="nowrap">Date:</td>
+                    <td width="60%">
+                        <input class="dateplugin frm" type="text" size="30" name="credit_date"
+                               value="{$today}">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" valign="top" nowrap="nowrap">Title of activity:</td>
+                    <td width="60%"><input type="text" size="30" class="frm" name="activity">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" valign="top">Number of hours:</td>
+                    <td width="60%"><input type="text" maxlength="4" size="30" class="frm" name="credits">
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%" valign="top" nowrap="nowrap">Notes and reflection on activity:</td>
+                    <td width="60%"><textarea class="frm" rows="4" cols="39" name="notes"></textarea></td>
+                </tr>
+                <tr>
+                    <td>Evidence (optional):</td>
+                    <td><input type="file" name="evidence" id="evidence"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <input class="validate form-submit default form-submit-inline" type="submit" value="Submit" name="Submit">
+                        <input class="validate form-submit default form-submit-inline" type="button" value="Cancel"
+                               id="cancel-new-activity">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
 {literal}
 
 <script type="text/javascript">

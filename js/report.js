@@ -6,59 +6,52 @@ jQuery(function(){
         this.css('left', (cj(window).width() / 2) - (this.outerWidth() / 2));
         
         return this;
-    }
+    };
 
-    if (cj('.add-activity-response').length > 0) {
-        var id = '#' + this.id;
-        cj(id + '.activity-item').show();
-        cj(id + '.new-activity-item').html('Hide');
-    }
+    cj('.dateplugin').each(function () {
+          cj(this).datepicker({
+              dateFormat: 'dd-mm-yy',
+              changeMonth: true,
+              changeYear: true,
+              yearRange: '-100:+20'
+          });
+      }
+    );
 
-
-    cj('.show-activity-list').click(function(e) {
-        var id = '#' + this.id;
-        cj(id + '.activity-item').hide();
-        cj(id +  '.new-activity-item').html('New');
-        cj('.update-activity').hide();
-
-        if (cj(id + '.activity-list').is(':visible')) {
-            cj(id + '.activity-list').hide();
-            cj(this).html('Show');
-        } else {
-            cj(id + '.activity-list').show();
-            cj(this).html('Hide');
-        }
+    cj('.activity-item').dialog({
+        autoOpen: false,
+        minWidth: 460
     });
 
-    cj('.new-activity-item').click(function(e) {
-        var id = '#' + this.id;
-        cj('.update-activity').hide();
+    cj('.category-title').on('click', function (e) {
+        e.preventDefault();
 
-        if (cj(id + '.activity-item').is(':visible')) {
-            cj(id + '.activity-item').hide();
-            cj(this).html('New');
-        } else {
-            if (cj(id + '.activity-list').is(':visible')) {
-               cj(id + '.activity-list').hide(); 
-               cj(id + '.show-activity-list').html('Show');
-            }
+        var category = cj(this).parents('.category');
+        var activityList = category.find('.activity-list');
 
-            cj(id + '.activity-item').show();
-            cj(this).html('Hide');
-        }
+        var icon = cj(this).find('.toggle-activity-list');
+
+        icon.toggleClass('contracted');
+        activityList.slideToggle();
     });
 
-    cj('.upload-new-activity-item').click(function(e) {
-        if (cj('.activity-item-import-pdf').is(':visible')) {
-            cj('.activity-item-import-pdf').hide();
-            cj(this).html('New');
-        } else {
-            cj('.activity-item-import-pdf').show();
-            cj(this).html('Hide');
-        }
+    cj('.new-activity-item').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var categoryId = cj(this).data('category-id');
+        var activityForm = cj('.activity-item');
+
+        activityForm.find('#manual-import-category-id').val(categoryId);
+
+        activityForm.dialog('open');
     });
-    
-    cj('#branding div.breadcrumb').html('<a href="/">Home</a> » <a href="/civicrm' + 
+
+    cj('#cancel-new-activity').on('click', function() {
+        cj('.activity-item').dialog('close');
+    });
+
+    cj('#branding div.breadcrumb').html('<a href="/">Home</a> » <a href="/civicrm' +
         '/user">Contact Dashboard</a> » CPD Reporting'); 
 
     cj('#select_year').change(function() {

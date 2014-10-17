@@ -48,12 +48,12 @@ margin-top: 400px;
    color:#EB1040;
 }
 
-.activity-item-manual {
-margin: 0 10% 0 10%;
-float: left;
-width: 30%;
-height: 200px;
+.inline {
+    display: inline !important;
+    float: none !important;
 }
+
+.activity-item-manual {}
 
 .activity-item-import {
 margin: 0 10% 0 10%;
@@ -65,8 +65,35 @@ height: 200px;
 .add-new-category,
 .activity-item-import-pdf,
 .activity-item,
-.activity-list {
-    display:none;
+.activity-list {}
+
+.category-title {
+    cursor: pointer;
+    position: relative;
+}
+
+.category-title .button {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.toggle-activity-list {
+    background: url(https://ies-uk.ccuptest.co.uk/sites/all/themes/ies_theme/images/icons/iconsCollapseXSmallSprite.gif) no-repeat center -11px;
+    text-indent: -9999em;
+    display: block;
+    float: left;
+    width: 19px;
+    height: 19px;
+    margin-right: 5px;
+}
+
+.toggle-activity-list.contracted {
+    background-position: center 5px;
+}
+
+.hidden {
+    display: none;
 }
 
 .clear{

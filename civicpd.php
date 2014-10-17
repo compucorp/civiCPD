@@ -6,7 +6,7 @@
 
 define('CPD_EXT_NAME', 'ca.lunahost.civicpd');
 define('CPD_MIN_CREDITS', 30);
-define('CPD_MAX_CREDITS', 300);
+define('CPD_MAX_CREDITS', 250);
 
 civicpd_setupPaths();
 
