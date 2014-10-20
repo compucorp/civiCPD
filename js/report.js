@@ -23,6 +23,32 @@ jQuery(function(){
         minWidth: 460
     });
 
+    cj('.activity-item-manual').find('form').on('submit', function(e) {
+        console.log('submitted');
+
+        var form = cj(this);
+
+        var validated = true;
+        var errorBlock = form.find('.failure');
+
+        var required = form.find('input, textarea').each(function (index, element) {
+            var input = cj(element);
+
+            if (input.prop('required') === true && !input.val()) {
+                input.addClass('error');
+
+                validated = false;
+            } else {
+                input.removeClass('error');
+            }
+        });
+
+        if (!validated) {
+            errorBlock.removeClass('hidden');
+            e.preventDefault();
+        }
+    });
+
     cj('.category-title').on('click', function (e) {
         e.preventDefault();
 

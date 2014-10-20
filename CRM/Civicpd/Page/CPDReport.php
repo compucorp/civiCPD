@@ -142,7 +142,7 @@ function civi_cpd_report_get_category($dao) {
     <td>
 
       <h1 class="category-title">
-        <a href class="toggle-activity-list">Show</a>'
+        <a href class="toggle-activity-list" style="background-image: ' . CPD_PATH   . '/assets/collapse-sprite.gif">Show</a>'
       . $dao->category . ': Total hours recorded: ' . number_format($dao->credits, 2) . 'h';
 
     if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit==0) {
@@ -578,7 +578,8 @@ function civi_cpd_report_insert_activity()  {
         civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'],
             TRUE);
     } else {
-        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], 
+        CRM_Core_Session::setStatus('Please check details and try again', 'Failed to create activity!', 'error');
+        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'],
             FALSE);
     }
 }
