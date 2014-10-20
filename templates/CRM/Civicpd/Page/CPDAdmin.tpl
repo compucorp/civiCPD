@@ -28,6 +28,17 @@
     <td>&nbsp;</td>
   </tr>
   <tr>
+    <td colspan="2"><strong>CPD hours:</strong></td>
+  </tr>
+  <tr>
+    <td><label for="cpd_hours_min">Minimum CPD hours</label></td>
+    <td><input id="cpd_hours_min" name="cpd_hours_min" type="text" value="{$cpd_hours_min}" /></td>
+  </tr>
+  <tr>
+    <td><label for="cpd_hours_max">Maximum CPD hours</label></td>
+    <td><input id="cpd_hours_max" name="cpd_hours_max" type="text" value="{$cpd_hours_max}" /></td>
+  </tr>
+  <tr>
     <td colspan="2"><strong>Your organization's internal membership number:</strong><br/>
     Most organizations have an alphanumeric membership number attached to a members contact record. 
     By default the {$short_name} module uses the <i>'external_identifier'</i> however the <i>'user_unique_id'</i> can be used instead.</td>

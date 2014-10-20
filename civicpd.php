@@ -5,8 +5,6 @@
 //define('CPD_DIR', 'C:/xampp/htdocs/workplace/drupal-civi-dev/sites/all/extensions/civiCPD/');
 
 define('CPD_EXT_NAME', 'ca.lunahost.civicpd');
-define('CPD_MIN_CREDITS', 30);
-define('CPD_MAX_CREDITS', 250);
 
 civicpd_setupPaths();
 

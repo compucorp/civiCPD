@@ -161,9 +161,12 @@ function civi_cpd_report_get_category($dao) {
 }
 
 function civi_cpd_report_get_progress() {
+    $minCredits = civi_crm_report_get_cpd_hours_min();
+    $maxCredits = civi_crm_report_get_cpd_hours_max();
     $credits = CRM_Civicpd_Page_CPDReport::getTotalCredits();
-    $progressPercentage = 100 * $credits / CPD_MAX_CREDITS;
-    $minPercentage = 100 * CPD_MIN_CREDITS / CPD_MAX_CREDITS;
+
+    $progressPercentage = 100 * $credits / $maxCredits;
+    $minPercentage = 100 * $minCredits / $maxCredits;
     $color = $progressPercentage < $minPercentage ? 'red' : 'green';
 
     $progress =
@@ -172,8 +175,8 @@ function civi_cpd_report_get_progress() {
             <div class="graphcont">
               <div class="graph">
                 <strong class="bar" style="width: ' . $progressPercentage . '%; background: ' . $color .'">' . $credits . ' h</strong>
-                <span class="marker" style="width: ' .$minPercentage . '%;"><span>Target ' . CPD_MIN_CREDITS . ' h</span></span>
-                <span class="marker" style="width: 100%;"><span>' . CPD_MAX_CREDITS . ' h</span></span>
+                <span class="marker" style="width: ' .$minPercentage . '%;"><span>Target ' . $minCredits . ' h</span></span>
+                <span class="marker" style="width: 100%;"><span>' . $maxCredits . ' h</span></span>
               </div>
             </div>
             <div class="clear"></div>
@@ -752,6 +755,10 @@ function civi_crm_report_set_default_titles(array $arr_defaults) {
         $arr_defaults['long_name'] : 'Continuing Professional Development';
     $_SESSION['civi_crm_report']['short_name'] = isset($arr_defaults['short_name']) ? 
         $arr_defaults['short_name'] : 'CPD';
+    $_SESSION['civi_crm_report']['cpd_hours_min'] = isset($arr_defaults['cpd_hours_min']) ?
+        $arr_defaults['cpd_hours_min'] : 30;
+    $_SESSION['civi_crm_report']['cpd_hours_max'] = isset($arr_defaults['cpd_hours_max']) ?
+        $arr_defaults['cpd_hours_max'] : 250;
 }
 
 function civi_crm_report_get_member_update_limit() {
@@ -764,6 +771,14 @@ function civi_crm_report_get_organization_member_number_field() {
 
 function civi_crm_report_get_short_name() {
     return $_SESSION['civi_crm_report']['short_name'];
+}
+
+function civi_crm_report_get_cpd_hours_min() {
+    return $_SESSION['civi_crm_report']['cpd_hours_min'];
+}
+
+function civi_crm_report_get_cpd_hours_max() {
+    return $_SESSION['civi_crm_report']['cpd_hours_max'];
 }
 
 function civi_crm_report_get_default_variables() {

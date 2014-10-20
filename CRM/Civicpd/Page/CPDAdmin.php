@@ -66,7 +66,19 @@ class CRM_Civicpd_Page_CPDAdmin extends CRM_Core_Page {
   		 		$sql .= "('short_name', '".$_POST['short_name']."'),";
   		 	}
   		 }
-  		
+
+  		 if( isset( $_POST['cpd_hours_min'] ) ) {
+  		 	if((int)$_POST['cpd_hours_min'] >= 0) {
+  		 		$sql .= "('cpd_hours_min', '" . (int)$_POST['cpd_hours_min']."'),";
+  		 	}
+  		 }
+
+  		 if( isset( $_POST['cpd_hours_max'] ) ) {
+  		 	if((int)$_POST['cpd_hours_max'] >= 0) {
+  		 		$sql .= "('cpd_hours_max', '" . (int)$_POST['cpd_hours_max']."'),";
+  		 	}
+  		 }
+
   		 $sql = rtrim($sql,",");//remove the extra comma
   		 $dao = CRM_Core_DAO::executeQuery($sql);
   		 
@@ -143,12 +155,26 @@ class CRM_Civicpd_Page_CPDAdmin extends CRM_Core_Page {
     	} else {
     		$short_name = 'CPD';
     	}
-    	
+
+	  	if(isset($arr_defaults['cpd_hours_min'])) {
+		  	$cpd_hours_min = $arr_defaults['cpd_hours_min'];
+		} else {
+		  	$cpd_hours_min = 30;
+		}
+
+	  	if(isset($arr_defaults['cpd_hours_max'])) {
+		  	$cpd_hours_max = $arr_defaults['cpd_hours_max'];
+		} else {
+		  	$cpd_hours_max = 250;
+		}
+
     } else {
     		$member_update_limit = 0;
     		$organization_member_number_field = 'civicrm_contact.external_identifier';
     		$long_name = 'Continuing Professional Development';
     		$short_name = 'CPD';
+	  		$cpd_hours_min = 30;
+	  		$cpd_hours_max = 250;
     }
     
     $arr_member_edit_limit = array('1','2','3','4','5','0');
@@ -198,6 +224,8 @@ class CRM_Civicpd_Page_CPDAdmin extends CRM_Core_Page {
   	$this->assign('organization_member_number', $organization_member_number);
     $this->assign('long_name', $long_name);
     $this->assign('short_name', $short_name);
+	$this->assign('cpd_hours_min', $cpd_hours_min);
+	$this->assign('cpd_hours_max', $cpd_hours_max);
 
     parent::run();
   }
