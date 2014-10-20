@@ -432,6 +432,8 @@ function civi_cpd_report_import_activity_pdf() {
             $file = CPD_DIR . 'uploads/activity/' . date('Y-m-d') . '-' . $_POST['user_id'] . '.pdf';
             $result = move_uploaded_file($_FILES['file']['tmp_name'], $file); 
             civi_cpd_report_set_activity_upload_response('add', $result);
+
+            CRM_Civicpd_Page_CPDReport::redirectToReport();
         } 
     } 
 }
@@ -578,12 +580,12 @@ function civi_cpd_report_insert_activity()  {
             )";
 
         CRM_Core_DAO::executeQuery($sql);
-        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'],
-            TRUE);
+        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], TRUE);
+
+        CRM_Civicpd_Page_CPDReport::redirectToReport();
     } else {
         CRM_Core_Session::setStatus('Please check details and try again', 'Failed to create activity!', 'error');
-        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'],
-            FALSE);
+        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], FALSE);
     }
 }
 
@@ -621,9 +623,11 @@ function civi_cpd_report_update_activity() {
          CRM_Core_Session::setStatus(' ', 'Activity updated', 'success', array('expires' => 2000));
 
          civi_cpd_report_set_edit_activity_response('update', $_POST['category_id'], TRUE);
+
+        CRM_Civicpd_Page_CPDReport::redirectToReport();
      } else {
          civi_cpd_report_set_edit_activity_response('update', $_POST['category_id'], FALSE);
-     } 
+     }
  }
 
 function civi_cpd_report_get_editable_activity($category_id) {
