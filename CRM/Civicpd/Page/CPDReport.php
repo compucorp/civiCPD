@@ -10,13 +10,13 @@
 require_once 'CRM/Core/Page.php';
 
 class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
-    static public $totalCredits = 0;
-  
+    static public $totalCredits = null;
+
     function run() {
-        
+
         CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd.css');
         CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/report.js', 0 , 'page-header');
-        
+
         $session = CRM_Core_Session::singleton();
 
         civi_cpd_report_set_contact_id($session->get('userID'));
@@ -29,11 +29,8 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
 //                case 'import':
 //                    civi_cpd_report_import_activity();
 //                break;
-                case 'import-pdf':
-                    civi_cpd_report_import_activity_pdf();
-                break;
-            
-                case 'insert':  
+
+                case 'insert':
                     civi_cpd_report_insert_activity();
                     break;
 
@@ -44,11 +41,7 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
                 case 'edit':
                     civi_cpd_report_set_editable_activity();
                     break;
-                
-                case 'download_pdf':
-                    civi_cpd_report_download_pdf_activity();
-                    break;
-                
+
                 case 'delete':
                     civi_cpd_report_delete_activity();
                     break;
@@ -79,23 +72,22 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
         parent::run();
     }
 
-    public static function incrementTotalCredits($credits) {
-        static::$totalCredits += (int) $credits;
-    }
-
-    public static function getTotalCredits() {
-        return static::$totalCredits;
-    }
-
-    static public function getApprovalStatus($cid) {
-        $sql
-          = "
-            SELECT a.approved
-            FROM civi_cpd_activities a
-            WHERE
-                a.contact_id = %0
-           	    AND YEAR(a.credit_date) = %1
-        ";
+  /**
+   * Get the total number of hours (credits) for the given contact for the currently selected year
+   *
+   * @param $cid
+   *
+   * @return null
+   */
+    public static function getTotalCredits($cid) {
+      if (is_null(static::$totalCredits)) {
+         $sql = "
+          SELECT SUM(credits) total_credits
+          FROM civi_cpd_activities
+          WHERE
+            contact_id = %0
+            AND YEAR(credit_date) = %1
+         ";
 
         $params = array(
           array((int) $cid, 'Integer'),
@@ -103,38 +95,93 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
         );
 
         $dao = CRM_Core_DAO::executeQuery($sql, $params);
-
-        $total = $approved = 0;
-        while ($dao->fetch()) {
-            if ($dao->approved) {
-                $approved++;
-            }
-
-            $total++;
-        }
+        $dao->fetch();
+        static::$totalCredits = $dao->total_credits;
 
         $dao->free();
+      }
 
-        return ($total && $total == $approved);
+      return static::$totalCredits;
     }
 
+  /**
+   * Get CPD approval status for the given contact for the currently selected year
+   *
+   * @param $cid
+   *
+   * @return bool
+   */
+    static public function getApprovalStatus($cid) {
+      $sql = "
+            SELECT a.approved
+            FROM civi_cpd_activities a
+            WHERE
+                a.contact_id = %0
+           	    AND YEAR(a.credit_date) = %1
+        ";
+
+      $params = array(
+        array((int) $cid, 'Integer'),
+        array((int) $_SESSION['report_year'], 'Integer')
+      );
+
+      $dao = CRM_Core_DAO::executeQuery($sql, $params);
+
+      $total = $approved = 0;
+      while ($dao->fetch()) {
+        if ($dao->approved) {
+          $approved++;
+        }
+
+        $total++;
+      }
+
+      $dao->free();
+
+      return ($total && $total == $approved);
+    }
+
+  /**
+   * Whether uploading full CPD is allowed. This currently only returns true if a full CPD has *not* been uploaded yet.
+   *
+   * @return bool
+   */
+  public static function isFullCpdUploadAllowed() {
+    $sql = "
+        SELECT COUNT(*) count
+        FROM civi_cpd_activities
+        WHERE
+          category_id = %0
+          AND YEAR(credit_date) = %1
+        ";
+
+    $params = array(
+      array(CPD_FULL_CPD_CATEGORY_ID, 'Integer'),
+      array((int) $_SESSION['report_year'], 'Integer')
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $dao->fetch();
+    $count = $dao->count;
+
+    return $count == 0;
+  }
+
+  /**
+   * Redirect to the report
+   */
   public static function redirectToReport() {
     CRM_Utils_System::redirect('report');
   }
 }
 
-function civi_cpd_report_download_pdf_activity() {
-    if (isset($_GET['upload_id']) && substr($_GET['upload_id'], 11) == civi_cpd_report_get_contact_id()) {
-        $file = CPD_DIR . 'uploads/activity/' . $_GET['upload_id'] . '.pdf';
-        
-        if (file_exists($file)) { 
-            header("Content-type:application/pdf");
-            header("Content-Disposition:attachment;filename='uploaded_activity.pdf'");
-            readfile($file); 
-        }
-    }
-}
-
+/**
+ * Get HTML for category headings
+ *
+ * @param $dao
+ *
+ * @return string
+ */
 function civi_cpd_report_get_category($dao) {
     $member_update_limit = civi_crm_report_get_member_update_limit();
 
@@ -142,7 +189,7 @@ function civi_cpd_report_get_category($dao) {
     <td>
 
       <h1 class="category-title">
-        <a href class="toggle-activity-list" style="background-image: ' . CPD_PATH   . '/assets/collapse-sprite.gif">Show</a>'
+        <a href class="toggle-activity-list" style="background-image: url(' . CPD_PATH   . '/assets/collapse-sprite.gif)">Show</a>'
       . $dao->category . ': Total hours recorded: ' . number_format($dao->credits, 2) . 'h';
 
     if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit==0) {
@@ -160,10 +207,15 @@ function civi_cpd_report_get_category($dao) {
     return $category;
 }
 
+/**
+ * Get HTML for the overall progress bar
+ *
+ * @return string
+ */
 function civi_cpd_report_get_progress() {
     $minCredits = civi_crm_report_get_cpd_hours_min();
     $maxCredits = civi_crm_report_get_cpd_hours_max();
-    $credits = CRM_Civicpd_Page_CPDReport::getTotalCredits();
+    $credits = CRM_Civicpd_Page_CPDReport::getTotalCredits(civi_cpd_report_get_contact_id());
 
     $progressPercentage = 100 * $credits / $maxCredits;
     $minPercentage = 100 * $minCredits / $maxCredits;
@@ -186,6 +238,13 @@ function civi_cpd_report_get_progress() {
     return $progress;
 }
 
+/**
+ * Get HTML for listing of activities, excluding full CPD activity
+ *
+ * @param $category_id
+ *
+ * @return string
+ */
 function civi_cpd_report_get_activity_table($category_id) {
     $sql = "SELECT civi_cpd_categories.category
         , civi_cpd_activities.id AS activity_id
@@ -222,22 +281,27 @@ function civi_cpd_report_get_activity_table($category_id) {
     return $activity_table;
 }
 
-function civi_cpd_report_get_pdf_import($user_id) {
+/**
+ * Get HTML form for uploading a new full CPD record
+ *
+ * @return string
+ */
+function civi_cpd_report_get_pdf_import() {
     
     // PDF post URL
     $pdf_post_url = CRM_Utils_System::url("civicrm/civicpd/report", null, true, null, false, true);
     
     $pdf_import = '<div class="activity-item-import-pdf">
     <form  method="post" action="' . $pdf_post_url . '"  enctype="multipart/form-data">
-        <input type="hidden" value="import-pdf" name="action">
-        <input type="hidden" value="' . $user_id . '" name="user_id">
-        <input type="file" name="file" id="file">
-        <input type="submit" value="Upload PDF" class="validate form-submit ' . 
-            'default" name="Submit">
+        <input type="hidden" value="insert" name="action">
+        <input type="hidden" value="' . CPD_FULL_CPD_CATEGORY_ID . '" id="full-cpd-import-category-id" name="category_id">
+        <input required type="file" name="file" id="file">
+        <input required size="8" maxlength="4" type="input" name="full_cpd_credits" placeholder="Hours">
+        <input type="submit" value="Upload PDF" class="validate form-submit default" name="Submit">
     </form>
     </div>';
 
-    return $pdf_import;
+    return CRM_Civicpd_Page_CPDReport::isFullCpdUploadAllowed() ? $pdf_import : '';
 }
 
 function civi_cpd_report_get_total_credits() {
@@ -255,29 +319,28 @@ function civi_cpd_report_get_total_credits() {
     return empty($total_credits) ? 0 : $total_credits;
 }
 
+/**
+ * Delete an activity (individual or full CPD) along with the supporting PDF
+ */
 function civi_cpd_report_delete_activity() {
-    if (isset($_GET['upload_id'])) { 
-        $path = CPD_DIR . 'uploads/activity/' . $_GET['upload_id'] . '.pdf';
-        
-        if (file_exists($path)) {
-            $result = unlink($path);
-            civi_cpd_report_set_activity_upload_response('delete', $result);
-        } else {
-            civi_cpd_report_set_activity_upload_response('delete', FALSE);
-        }
-    } elseif(isset($_GET['activity_id']) && isset($_GET['category_id'])) {
-        civi_cpd_report_delete_evidence_pdf();
+  if (isset($_GET['activity_id']) && isset($_GET['category_id'])) {
+    if ($_GET['category_id'] == 0) {
+      civi_cpd_report_delete_full_cpd_pdf();
+    }
+    else {
+      civi_cpd_report_delete_evidence_pdf();
+    }
 
-        CRM_Core_DAO::executeQuery("DELETE FROM civi_cpd_activities WHERE id =" . $_GET['activity_id']);
-        civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'], TRUE);
+    CRM_Core_DAO::executeQuery("DELETE FROM civi_cpd_activities WHERE id =" . $_GET['activity_id']);
 
-        CRM_Core_Session::setStatus(' ', 'Activity deleted', 'success', array('expires' => 2000));
+    civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'], TRUE);
+    CRM_Core_Session::setStatus(' ', 'Activity deleted', 'success', array('expires' => 2000));
 
-        CRM_Civicpd_Page_CPDReport::redirectToReport();
-    } else {
-        civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'], 
-            FALSE);
-    } 
+    CRM_Civicpd_Page_CPDReport::redirectToReport();
+  }
+  else {
+    civi_cpd_report_set_edit_activity_response('delete', $_GET['category_id'], FALSE);
+  }
 }
 
 function civi_cpd_report_set_activity_upload_response($action, $success) {
@@ -417,25 +480,26 @@ function civi_cpd_report_unset_cpd_message() {
     }
 }
 
-function civi_cpd_report_import_activity_pdf() {
-    if (isset($_FILES["file"]) && strtolower($_FILES['file']['type']) == 'application/pdf' && isset($_POST['user_id'])) {
-        $uploads = scandir(CPD_DIR . 'uploads/activity/');
-        
-        foreach($uploads as $upload) {
-            if (substr($upload, -3) == 'pdf' && $_POST['user_id'] == substr($upload, 11, -4)) {
-                civi_cpd_report_set_activity_upload_response('add', FALSE);
-                $limit_reached = TRUE;
-            }
-        }
-        
-        if (!isset($limit_reached)) {
-            $file = CPD_DIR . 'uploads/activity/' . date('Y-m-d') . '-' . $_POST['user_id'] . '.pdf';
-            $result = move_uploaded_file($_FILES['file']['tmp_name'], $file); 
-            civi_cpd_report_set_activity_upload_response('add', $result);
+/**
+ * Upload PDF document for full CPD activity
+ *
+ * @return null|string
+ */
+function civi_cpd_report_import_full_cpd_pdf() {
+    $fileName = null;
 
-            CRM_Civicpd_Page_CPDReport::redirectToReport();
-        } 
-    } 
+    if (isset($_FILES["file"]) && strtolower($_FILES['file']['type']) == 'application/pdf') {
+      $fileName = date('Y-m-d')
+        . '-' . civi_cpd_report_get_contact_id()
+        . '.pdf';
+
+        $path = civi_cpd_report_get_full_cpd_pdf_path($fileName);
+        $fileName = move_uploaded_file($_FILES['file']['tmp_name'], $path)
+          ? $fileName
+          : null;
+    }
+
+    return $fileName;
 }
 
 /**
@@ -449,7 +513,11 @@ function civi_cpd_report_import_activity_evidence_pdf() {
     if (isset($_FILES["evidence"])
       && strtolower($_FILES['evidence']['type']) == 'application/pdf'
       && isset($_POST['category_id'])) {
-        $fileName = date('Y-m-d-s') . '-'  . $_POST['category_id'] . '-' . civi_cpd_report_get_contact_id() . '.pdf';
+        $fileName = date('Y-m-d-s') . '-'
+          . civi_cpd_report_get_contact_id()
+          . '-' . $_POST['category_id']
+          . '.pdf';
+
         $path = civi_cpd_report_get_evidence_pdf_path($fileName);
         $fileName = move_uploaded_file($_FILES['evidence']['tmp_name'], $path)
           ? $fileName
@@ -486,6 +554,33 @@ function civi_cpd_report_delete_evidence_pdf() {
   }
 }
 
+/**
+ * Delete PDF for a full CPD activity
+ */
+function civi_cpd_report_delete_full_cpd_pdf() {
+    $activityId = $_GET['activity_id'];
+    $categoryId = CPD_FULL_CPD_CATEGORY_ID;
+
+    $fileName = NULL;
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT evidence FROM civi_cpd_activities WHERE id = ' . $activityId);
+    $dao->fetch();
+
+    if ($fileName = $dao->evidence) {
+        $absoluteFilePath = civi_cpd_report_get_evidence_pdf_path($fileName);
+
+        if (file_exists($absoluteFilePath)) {
+            unlink($absoluteFilePath);
+            CRM_Core_DAO::executeQuery('UPDATE civi_cpd_activities SET evidence = NULL WHERE id = ' . $activityId);
+            CRM_Core_Session::setStatus(' ', 'Evidence deleted', 'success', array('expires' => 2000));
+        }
+    }
+
+  if (isset($_GET['redirect']) && $_GET['redirect'] == 'true') {
+    CRM_Utils_System::redirect("report?action=edit&activity_id={$activityId}&category_id={$categoryId}");
+  }
+}
+
 function civi_cpd_report_get_evidence_pdf_path($fileName) {
     return CPD_DIR . 'uploads/evidence/' . $fileName;
 }
@@ -494,71 +589,138 @@ function civi_cpd_report_get_evidence_pdf_url($fileName) {
     return CPD_PATH . '/uploads/evidence/' . $fileName;
 }
 
-function civi_cpd_report_get_uploaded_activity_list($user_id) {
-    $pdf_upload_table = '<h3>Upload full CPD record:</h3>'
-        . '<p>If you have already recorded your CPD in a different format you can upload it in
-pdf format here.</p>'
-        . '<div class="upload-activity-buttons">'
-        . '<a class="upload-new-activity-item" href="#">Add new CPD activity</a></div>'
-        .  civi_cpd_report_get_pdf_import($user_id)   
-        . '<p><em>' . civi_cpd_report_get_activity_upload_response() . '</em></p>';
-    
-    $uploads = scandir(CPD_DIR . 'uploads/activity/');
-        
-    foreach($uploads as $upload) {
-        if (substr($upload, -3) == 'pdf' && $user_id == substr($upload, 11, -4)) {
-            $pdf_upload_table .= '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>'
-                . '<tr>'
-                .   '<th width="40%">Date</th>'
-                .   '<th width="20%">Action</th>'
-                .    '<th width="40%">&nbsp;</th>'
-                . '</tr>';  
-
-                $pdf_upload_table .= '<tr>' .
-                    '<td width="40%" valign="top">' . date("M d, Y", strtotime(substr($upload, 0, 10))) . 
-                        '</td>' .
-                    '<td width="20%" valign="top"><a href="/civicrm/civicpd/report&action=download_pdf&upload_id=' .
-                        substr($upload, 0, -4) . '"> view </a>';
-
-                $member_update_limit = civi_crm_report_get_member_update_limit();
-
-                if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit == 0) {
-                    $pdf_upload_table .= '| <a class="delete" href="' . 
-                        '/civicrm/civicpd/report?action=delete&upload_id=' . substr($upload, 0, -4) . 
-                        '">delete</a>';
-                } else {
-                    $pdf_upload_table .= 'locked';
-                }		
-
-                $pdf_upload_table .= '</td><td width="40%" nowrap="nowrap">&nbsp;' .
-                    '</td></tr>';
-
-                $pdf_upload_table .= '</tbody></table>';
-        }
-    } 
-    
-    return $pdf_upload_table;
+function civi_cpd_report_get_full_cpd_pdf_path($fileName) {
+    return CPD_DIR . 'uploads/activity/' . $fileName;
 }
 
-function civi_cpd_report_insert_activity()  {
-    if (isset($_POST['credit_date'])) {
-        $_POST['credit_date'] = civi_crm_report_convert_uk_to_mysql_date($_POST['credit_date']);
+function civi_cpd_report_get_full_cpd_pdf_url($fileName) {
+    return CPD_PATH . '/uploads/activity/' . $fileName;
+}
+
+/**
+ * Get HTML for full CPD activity listing
+ *
+ * @param $user_id
+ *
+ * @return string
+ */
+function civi_cpd_report_get_uploaded_activity_list($user_id) {
+  $sql = "
+        SELECT civi_cpd_activities.id,
+            civi_cpd_activities.credits,
+            civi_cpd_activities.credit_date,
+            civi_cpd_activities.evidence
+
+        FROM civi_cpd_activities
+
+        WHERE
+            category_id = " . CPD_FULL_CPD_CATEGORY_ID . "
+            AND contact_id = " . $user_id . "
+            AND YEAR(credit_date) = " . $_SESSION['report_year'] . "
+
+        ORDER BY credit_date";
+
+  $dao = CRM_Core_DAO::executeQuery($sql);
+
+  $pdf_upload_table = '<h3>Upload full CPD record:</h3>'
+    . '<p>If you have already recorded your CPD in a different format you can upload it in
+pdf format here.</p>'
+    . civi_cpd_report_get_pdf_import($user_id)
+    . '<p><em>' . civi_cpd_report_get_activity_upload_response() . '</em></p>';
+
+  $pdf_upload_table .= '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>'
+    . '<tr>'
+    . '<th width="40%">Date</th>'
+    . '<th width="40%">Hours</th>'
+    . '<th width="20%">Action</th>'
+    . '<th width="40%">&nbsp;</th>'
+    . '</tr>';
+
+  while ($dao->fetch()) {
+    $pdf_upload_table .= '<tr>' .
+      '<td width="40%" valign="top">' . date("M d, Y", strtotime($dao->credit_date)) . '</td>' .
+      '<td width="40%" valign="top">' . abs($dao->credits) . '</td>' .
+      '<td width="20%" valign="top">
+          <a href="' . civi_cpd_report_get_full_cpd_pdf_url($dao->evidence) . '" target="_blank"> view </a>';
+
+    $member_update_limit = civi_crm_report_get_member_update_limit();
+
+    if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit == 0) {
+      $pdf_upload_table .= '| <a class="delete"
+      href="' . '/civicrm/civicpd/report?action=delete&activity_id=' . $dao->id . '&category_id='
+        . CPD_FULL_CPD_CATEGORY_ID . '">delete</a>';
+    }
+    else {
+      $pdf_upload_table .= 'locked';
     }
 
-    if(!empty($_POST['category_id'])
-      && civi_cpd_report_validate_date($_POST['credit_date'])
-      && civi_cpd_report_validate_number($_POST['credits'])
-      && !empty($_POST['notes'])
-      && !empty($_POST['activity'])) {
-        $contactId = civi_cpd_report_get_contact_id();
-        $categoryId = $_POST['category_id'];
-        $creditDate = $_POST['credit_date'];
-        $credits = number_format($_POST['credits'], 2, '.', '');
-        $activity = $_POST['activity'];
-        $notes = $_POST['notes'];
-        $evidenceFileName = civi_cpd_report_import_activity_evidence_pdf();
+    $pdf_upload_table .= '</td></tr>';
+  }
 
-        $sql = "
+  $pdf_upload_table .= '</tbody></table>';
+
+  return $pdf_upload_table;
+}
+
+/**
+ * Insert a new activity - either a normal or full CPD activity. This also takes care of directing PDF uploads.
+ */
+function civi_cpd_report_insert_activity() {
+  if (isset($_POST['credit_date'])) {
+    $_POST['credit_date'] = civi_crm_report_convert_uk_to_mysql_date($_POST['credit_date']);
+  }
+
+  if (isset($_POST['category_id'])) {
+    // Save full CPD record
+    if ($_POST['category_id'] == CPD_FULL_CPD_CATEGORY_ID
+      && civi_cpd_report_validate_number($_POST['full_cpd_credits'])
+      && CRM_Civicpd_Page_CPDReport::isFullCpdUploadAllowed()
+    ) {
+      $contactId = civi_cpd_report_get_contact_id();
+      $categoryId = $_POST['category_id'];
+      $creditDate = date('Y-m-d');
+      $credits = number_format($_POST['full_cpd_credits'], 2, '.', '');
+      $evidenceFileName = civi_cpd_report_import_full_cpd_pdf();
+
+      $sql = "
+                  INSERT INTO civi_cpd_activities
+                  (
+                      contact_id,
+                      category_id,
+                      credit_date,
+                      credits,
+                      evidence
+                  )
+                  VALUES(
+                     '$contactId',
+                     '$categoryId',
+                     '$creditDate',
+                     '$credits',
+                     '$evidenceFileName'
+                  )";
+
+      CRM_Core_DAO::executeQuery($sql);
+      civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], TRUE);
+
+      CRM_Core_Session::setStatus(' ', 'Full CPD record uploaded', 'success', array('expires' => 2000));
+    }
+    // Save activity
+    elseif ($_POST['category_id'] != CPD_FULL_CPD_CATEGORY_ID
+      && civi_cpd_report_validate_number($_POST['credits'])
+      && isset($_POST['credit_date'])
+      && civi_cpd_report_validate_date($_POST['credit_date'])
+      && !empty($_POST['notes'])
+      && !empty($_POST['activity'])
+    ) {
+      $contactId = civi_cpd_report_get_contact_id();
+      $categoryId = $_POST['category_id'];
+      $creditDate = $_POST['credit_date'];
+      $credits = number_format($_POST['credits'], 2, '.', '');
+      $activity = $_POST['activity'];
+      $notes = $_POST['notes'];
+      $evidenceFileName = civi_cpd_report_import_activity_evidence_pdf();
+
+      $sql = "
             INSERT INTO civi_cpd_activities
             (
                 contact_id,
@@ -579,14 +741,16 @@ function civi_cpd_report_insert_activity()  {
                '$evidenceFileName'
             )";
 
-        CRM_Core_DAO::executeQuery($sql);
-        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], TRUE);
-
-        CRM_Civicpd_Page_CPDReport::redirectToReport();
-    } else {
-        CRM_Core_Session::setStatus('Please check details and try again', 'Failed to create activity!', 'error');
-        civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], FALSE);
+      CRM_Core_DAO::executeQuery($sql);
+      civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], TRUE);
     }
+  }
+  else {
+    CRM_Core_Session::setStatus('Please check details and try again', 'Failed to create activity!', 'error');
+    civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], FALSE);
+  }
+
+  CRM_Civicpd_Page_CPDReport::redirectToReport();
 }
 
 function civi_cpd_report_update_activity() {
@@ -641,8 +805,10 @@ function civi_cpd_report_get_editable_activity_category_id() {
         $_SESSION['civi_crm_report']['edit_activity_category_id'] : NULL;
 }
 
+/**
+ * Get HTML for the form for editing an existing activity
+ */
 function civi_cpd_report_set_editable_activity() {
-    //CRM_Utils_System::setTitle(ts('Edit ' . civi_crm_report_get_short_name() . ' Activity'));
     $activity_id = $_GET['activity_id'];
 
     if(isset($activity_id)) {
@@ -680,12 +846,12 @@ function civi_cpd_report_set_editable_activity() {
 
         $_SESSION['civi_crm_report']['edit_activity_category_id'] = $dao->id;
         $_SESSION['civi_crm_report']['edit_activity'] = '<div class="update-activity">
-            <form method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data">
+            <form class="crm-form-block" method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data">
                 <input type="hidden" value="update" name="action">
                 <input type="hidden" value="'. $dao->id .'" name="category_id">
                 <input type="hidden" value="'. $activity_id .'" name="activity_id">
                 <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
-                   <p><em>Update Activity:</em></p>
+                   <h3>Update Activity:</h3>
                     <tbody>
                         <tr>
                             <td width="5%" valign="top" nowrap="nowrap">Date:</td>
@@ -727,6 +893,8 @@ function civi_cpd_report_set_editable_activity() {
 }
 
 /**
+ * Format a date formatted to UK standard format from MySQL
+ *
  * @param $date
  *
  * @return string
@@ -739,6 +907,8 @@ function civi_crm_report_convert_mysql_to_uk_date($date) {
 }
 
 /**
+ * Format a date formatted to MySQL format from UK standard format
+ *
  * @param $date
  *
  * @return string
@@ -849,7 +1019,14 @@ function civi_cpd_report_no_activities_action() {
 
      header("Location: /civicrm/civicpd/report");   
  }
- 
+
+/**
+ * Get HTML for a single activity in the activity listing
+ *
+ * @param $dao
+ *
+ * @return string
+ */
  function civi_cpd_report_get_activities_list($dao) {
     $activity_list = '<tr>';
     $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
@@ -883,21 +1060,32 @@ function civi_cpd_report_no_activities_action() {
  * year, GROUP BY Categories
  */
 function civi_crm_report_get_content() {
-   $sql = "SELECT civi_cpd_categories.id AS id, civi_cpd_categories.category AS category, " .
-       "SUM(civi_cpd_activities.credits) AS credits, civi_cpd_categories.minimum, " . 
-       "civi_cpd_categories.maximum, civi_cpd_categories.description FROM civi_cpd_categories " . 
-       "LEFT OUTER JOIN civi_cpd_activities ON civi_cpd_activities.category_id = civi_cpd_categories.id " . 
-       "AND civi_cpd_activities.contact_id = " . civi_cpd_report_get_contact_id() . " " .
-       "AND EXTRACT(YEAR FROM civi_cpd_activities.credit_date) = " . $_SESSION['report_year'] . " " .
-       "GROUP BY civi_cpd_categories.id";
+  $contactId = civi_cpd_report_get_contact_id();
+  $year = $_SESSION['report_year'];
+
+   $sql = "
+      SELECT
+        civi_cpd_categories.id AS id,
+        civi_cpd_categories.category AS category,
+        SUM(civi_cpd_activities.credits) AS credits,
+        civi_cpd_categories.minimum,
+        civi_cpd_categories.maximum,
+        civi_cpd_categories.description
+
+      FROM civi_cpd_categories
+
+      LEFT OUTER JOIN civi_cpd_activities
+        ON civi_cpd_activities.category_id = civi_cpd_categories.id
+        AND civi_cpd_activities.contact_id = $contactId
+        AND EXTRACT(YEAR FROM civi_cpd_activities.credit_date) = $year
+
+      GROUP BY civi_cpd_categories.id";
 
    $dao = CRM_Core_DAO::executeQuery($sql);
    $content = '';
    $i = 1;
 
    while ($dao->fetch()) {
-       CRM_Civicpd_Page_CPDReport::incrementTotalCredits($dao->credits);
-
        $content .= civi_cpd_report_get_category($dao);
        $content .= civi_cpd_report_get_activity_table($dao->id);
        $content .= civi_cpd_report_get_editable_activity($dao->id);

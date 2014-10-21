@@ -73,6 +73,14 @@ height: 200px;
 .activity-item,
 .activity-list {}
 
+.activity-item-import-pdf {}
+.activity-item-import-pdf input {
+    margin-right: 10px;
+}
+.activity-item-import-pdf #file {
+    width: 165px;
+}
+
 .category-title {
     cursor: pointer;
     position: relative;
@@ -85,7 +93,8 @@ height: 200px;
 }
 
 .toggle-activity-list {
-    background: url(https://ies-uk.ccuptest.co.uk/sites/all/themes/ies_theme/images/icons/iconsCollapseXSmallSprite.gif) no-repeat center -11px;
+    background-repeat: no-repeat;
+    background-position: center -11px;
     text-indent: -9999em;
     display: block;
     float: left;
@@ -96,6 +105,21 @@ height: 200px;
 
 .toggle-activity-list.contracted {
     background-position: center 5px;
+}
+
+body.page-civicrm-civicpd input {
+   font-size: inherit !important;
+}
+
+.crm-form-block {
+    padding: 20px !important;
+}
+.crm-form-block table {
+    margin-bottom: 0;
+}
+
+.crm-form-block tr td, tr th {
+    border: none;
 }
 
 .hidden {
