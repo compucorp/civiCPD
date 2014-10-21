@@ -226,7 +226,9 @@ function civi_cpd_report_get_progress() {
           <td>
             <div class="graphcont">
               <div class="graph">
-                <strong class="bar" style="width: ' . $progressPercentage . '%; background: ' . $color .'">' . $credits . ' h</strong>
+                <strong class="bar" style="width: ' . $progressPercentage . '%; background: ' . $color .'">'
+                  . number_format($credits, 0) . ' h
+                </strong>
                 <span class="marker" style="width: ' .$minPercentage . '%;"><span>Target ' . $minCredits . ' h</span></span>
                 <span class="marker" style="width: 100%;"><span>' . $maxCredits . ' h</span></span>
               </div>

@@ -93,8 +93,7 @@ height: 200px;
 }
 
 .toggle-activity-list {
-    background-repeat: no-repeat;
-    background-position: center -11px;
+    background: no-repeat center -11px;
     text-indent: -9999em;
     display: block;
     float: left;
