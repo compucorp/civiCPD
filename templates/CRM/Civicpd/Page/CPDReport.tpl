@@ -1,8 +1,10 @@
-<h3>Review and update your {$civi_cpd_long_name} activities.</h3>
+<h3>Review and update your {$civi_cpd_long_name} activities.
 {if $approved }
-    <img style="display: block; height: 30px; position: absolute; top: 23px; left: 215px;" src="{$imageUrl}"
+    <img style="/*display: block; position: absolute; top: 23px; left: 215px;*/ height: 30px;" src="{$imageUrl}"
          alt="Approved" title="Approved"/>
 {/if}
+</h3>
+
 <table id="category-list" width="100%" cellspacing="0" cellpadding="0" border="0">
   <tbody>
   	<tr valign="top">
