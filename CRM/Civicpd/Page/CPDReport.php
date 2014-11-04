@@ -107,17 +107,17 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
   /**
    * Get CPD approval status for the given contact for the currently selected year
    *
-   * @param $cid
+   * @param int $cid
    *
    * @return bool
    */
     static public function getApprovalStatus($cid) {
       $sql = "
-            SELECT a.approved
-            FROM civi_cpd_activities a
+            SELECT approved
+            FROM civi_cpd_activities
             WHERE
-                a.contact_id = %0
-           	    AND YEAR(a.credit_date) = %1
+                contact_id = %0
+           	    AND YEAR(credit_date) = %1
         ";
 
       $params = array(
@@ -144,18 +144,22 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
   /**
    * Whether uploading full CPD is allowed. This currently only returns true if a full CPD has *not* been uploaded yet.
    *
+   * @param int $cid
+   *
    * @return bool
    */
-  public static function isFullCpdUploadAllowed() {
+  public static function isFullCpdUploadAllowed($cid) {
     $sql = "
         SELECT COUNT(*) count
         FROM civi_cpd_activities
         WHERE
-          category_id = %0
-          AND YEAR(credit_date) = %1
+          contact_id = %0
+          AND category_id = %1
+          AND YEAR(credit_date) = %2
         ";
 
     $params = array(
+      array((int) $cid, 'Integer'),
       array(CPD_FULL_CPD_CATEGORY_ID, 'Integer'),
       array((int) $_SESSION['report_year'], 'Integer')
     );
@@ -165,6 +169,10 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page {
     $count = $dao->count;
 
     return $count == 0;
+  }
+
+  public static function isFileTypeAllowed($type) {
+    return strtolower($type) == 'application/pdf';
   }
 
   /**
@@ -297,13 +305,13 @@ function civi_cpd_report_get_pdf_import() {
     <form  method="post" action="' . $pdf_post_url . '"  enctype="multipart/form-data">
         <input type="hidden" value="insert" name="action">
         <input type="hidden" value="' . CPD_FULL_CPD_CATEGORY_ID . '" id="full-cpd-import-category-id" name="category_id">
-        <input required type="file" name="file" id="file">
+        <input title="Full CPD Record" required type="file" name="file" id="file">
         <input required size="8" maxlength="4" type="input" name="full_cpd_credits" placeholder="Hours">
         <input type="submit" value="Upload PDF" class="validate form-submit default" name="Submit">
     </form>
     </div>';
 
-    return CRM_Civicpd_Page_CPDReport::isFullCpdUploadAllowed() ? $pdf_import : '';
+    return CRM_Civicpd_Page_CPDReport::isFullCpdUploadAllowed(civi_cpd_report_get_contact_id()) ? $pdf_import : '';
 }
 
 function civi_cpd_report_get_total_credits() {
@@ -488,20 +496,28 @@ function civi_cpd_report_unset_cpd_message() {
  * @return null|string
  */
 function civi_cpd_report_import_full_cpd_pdf() {
-    $fileName = null;
+  $fileName = NULL;
 
-    if (isset($_FILES["file"]) && strtolower($_FILES['file']['type']) == 'application/pdf') {
+  if (isset($_FILES["file"])) {
+    if (CRM_Civicpd_Page_CPDReport::isFileTypeAllowed($_FILES['file']['type'])) {
       $fileName = date('Y-m-d')
         . '-' . civi_cpd_report_get_contact_id()
         . '.pdf';
 
-        $path = civi_cpd_report_get_full_cpd_pdf_path($fileName);
-        $fileName = move_uploaded_file($_FILES['file']['tmp_name'], $path)
-          ? $fileName
-          : null;
+      $path = civi_cpd_report_get_full_cpd_pdf_path($fileName);
+      $fileName = move_uploaded_file($_FILES['file']['tmp_name'], $path)
+        ? $fileName
+        : NULL;
     }
+    else {
+      CRM_Core_Session::setStatus('File type not allowed', 'Failed to save full CPD record', 'error',
+        array('expires' => 2000));
 
-    return $fileName;
+      return FALSE;
+    }
+  }
+
+  return $fileName;
 }
 
 /**
@@ -510,23 +526,28 @@ function civi_cpd_report_import_full_cpd_pdf() {
  * @return null|string
  */
 function civi_cpd_report_import_activity_evidence_pdf() {
-    $fileName = null;
+  $fileName = NULL;
 
-    if (isset($_FILES["evidence"])
-      && strtolower($_FILES['evidence']['type']) == 'application/pdf'
-      && isset($_POST['category_id'])) {
-        $fileName = date('Y-m-d-s') . '-'
-          . civi_cpd_report_get_contact_id()
-          . '-' . $_POST['category_id']
-          . '.pdf';
+  if (isset($_FILES["evidence"])) {
+    if (CRM_Civicpd_Page_CPDReport::isFileTypeAllowed($_FILES['evidence']['type']) && isset($_POST['category_id'])) {
+      $fileName = date('Y-m-d-s') . '-'
+        . civi_cpd_report_get_contact_id()
+        . '-' . $_POST['category_id']
+        . '.pdf';
 
-        $path = civi_cpd_report_get_evidence_pdf_path($fileName);
-        $fileName = move_uploaded_file($_FILES['evidence']['tmp_name'], $path)
-          ? $fileName
-          : null;
+      $path = civi_cpd_report_get_evidence_pdf_path($fileName);
+      $fileName = move_uploaded_file($_FILES['evidence']['tmp_name'], $path)
+        ? $fileName
+        : NULL;
     }
+    else {
+      CRM_Core_Session::setStatus(' ', 'File type not allowed', 'error', array('expires' => 2000));
 
-    return $fileName;
+      return FALSE;
+    }
+  }
+
+  return $fileName;
 }
 
 /**
@@ -676,13 +697,17 @@ function civi_cpd_report_insert_activity() {
     // Save full CPD record
     if ($_POST['category_id'] == CPD_FULL_CPD_CATEGORY_ID
       && civi_cpd_report_validate_number($_POST['full_cpd_credits'])
-      && CRM_Civicpd_Page_CPDReport::isFullCpdUploadAllowed()
+      && CRM_Civicpd_Page_CPDReport::isFullCpdUploadAllowed(civi_cpd_report_get_contact_id())
     ) {
       $contactId = civi_cpd_report_get_contact_id();
       $categoryId = $_POST['category_id'];
       $creditDate = date('Y-m-d');
       $credits = number_format($_POST['full_cpd_credits'], 2, '.', '');
       $evidenceFileName = civi_cpd_report_import_full_cpd_pdf();
+
+      if ($evidenceFileName === false) {
+        CRM_Civicpd_Page_CPDReport::redirectToReport();
+      }
 
       $sql = "
                   INSERT INTO civi_cpd_activities
@@ -721,6 +746,10 @@ function civi_cpd_report_insert_activity() {
       $activity = $_POST['activity'];
       $notes = $_POST['notes'];
       $evidenceFileName = civi_cpd_report_import_activity_evidence_pdf();
+
+      if ($evidenceFileName === false) {
+        CRM_Civicpd_Page_CPDReport::redirectToReport();
+      }
 
       $sql = "
             INSERT INTO civi_cpd_activities
@@ -771,6 +800,10 @@ function civi_cpd_report_update_activity() {
         $activity = $_POST['activity'];
         $notes = $_POST['notes'];
         $evidence = civi_cpd_report_import_activity_evidence_pdf();
+
+        if ($evidence === false) {
+          CRM_Civicpd_Page_CPDReport::redirectToReport();
+        }
 
         $sql = "
             UPDATE civi_cpd_activities

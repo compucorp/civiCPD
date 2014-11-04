@@ -23,32 +23,138 @@ jQuery(function(){
         minWidth: 460
     });
 
+    /**
+     * Process manual submission of an activity record
+     */
     cj('.activity-item-manual').find('form').on('submit', function(e) {
-        console.log('submitted');
-
         var form = cj(this);
 
+        var validationCandidates = form.find('input, textarea');
+        validateFormFields(form, validationCandidates, e);
+    });
+
+    /**
+     * Process full CPD upload
+     */
+    cj('.activity-item-import-pdf').find('form').on('submit', function (e) {
+        var form = cj(this);
+
+        var validationCandidates = form.find('input, textarea');
+        validateFormFields(form, validationCandidates, e);
+    });
+
+    /**
+     * Validate a collection for fields in a form
+     *
+     * @param form
+     * @param fields
+     * @param e
+     *
+     * @returns {{hasErrors: boolean, errors: Array}}
+     */
+    var validateFormFields = function(form, fields, e) {
+        var hasErrors = false;
+        var errors = [];
+
+        fields.each(function (index, element) {
+            var elementObj = cj(element);
+
+            var validationResult = validateInput(elementObj);
+
+            if (!validationResult.isValid) {
+                errors.push(validationResult.errors.join(', '));
+                hasErrors = true;
+            }
+        });
+
+        if (hasErrors) {
+            handleValidationFailure(form, errors, e);
+        } else {
+            handleValidationSuccess(form);
+        }
+
+        return {
+            hasErrors: hasErrors,
+            errors: errors
+        };
+    };
+
+    /**
+     * Validate a form field
+     *
+     * @param input
+     * @returns {{isValid: boolean, errors: Array}}
+     */
+    var validateInput = function(input) {
         var validated = true;
-        var errorBlock = form.find('.failure');
+        var errors = [];
 
-        var required = form.find('input, textarea').each(function (index, element) {
-            var input = cj(element);
-
-            if (input.prop('required') === true && !input.val()) {
+        if (input.attr('type') === 'file' && input.val()) {
+            if (input.val().split('.').pop().toLowerCase() !== 'pdf') {
                 input.addClass('error');
 
+                validated = false;
+                errors.push('Only PDF file format is allowed for ' + input.attr('title'));
+            } else {
+                input.removeClass('error');
+            }
+        }
+
+        if (input.prop('required') === true) {
+            if (!input.val()) {
+                input.addClass('error');
+
+                errors.push(input.attr('title') + ' is required');
                 validated = false;
             } else {
                 input.removeClass('error');
             }
+        }
+
+        return {
+            isValid: validated,
+            errors: errors
+        };
+    };
+
+    /**
+     * Handle the event when form validation fails
+     *
+     * @param form
+     * @param errors
+     * @param e
+     */
+    var handleValidationFailure = function(form, errors, e) {
+        var errorHtml = '<div class="errors"><p class="failure">Please fix the error(s) below:<br>';
+
+        cj.each(errors, function () {
+            errorHtml += this + '<br>';
         });
 
-        if (!validated) {
-            errorBlock.removeClass('hidden');
-            e.preventDefault();
-        }
-    });
+        errorHtml += '</p></div>';
 
+        var errorBlock = form.find('.errors').first();
+
+        if (errorBlock.length) {
+            errorBlock.html(errorHtml);
+        } else {
+            form.prepend(errorHtml);
+        }
+
+        e.preventDefault();
+    };
+
+    var handleValidationSuccess = function (form) {
+        var errorBlock = form.find('.errors').first();
+
+        if (errorBlock.length) {
+            errorBlock.remove();
+        }
+    };
+
+    /**
+     * Show/hide activities within a category upon clicking on the category title
+     */
     cj('.category-title').on('click', function (e) {
         e.preventDefault();
 
@@ -61,6 +167,9 @@ jQuery(function(){
         activityList.slideToggle();
     });
 
+    /**
+     * Show the modal popup for manually adding activity record
+     */
     cj('.new-activity-item').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -73,6 +182,9 @@ jQuery(function(){
         activityForm.dialog('open');
     });
 
+    /**
+     * Cancel adding full CPD report and close the modal popup
+     */
     cj('#cancel-new-activity').on('click', function() {
         cj('.activity-item').dialog('close');
     });
