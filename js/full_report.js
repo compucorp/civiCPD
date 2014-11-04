@@ -64,7 +64,7 @@ cj(function(){
         window.print();
     });
 
-    cj('.approve').on('click', function () {
+    cj('.table').on('click', '.approve', function () {
       var checkbox = cj(this);
       var totalHours = +checkbox.parents('tr').find('.total-credits').html();
 
