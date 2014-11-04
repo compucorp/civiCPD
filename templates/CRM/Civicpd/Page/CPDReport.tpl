@@ -53,7 +53,6 @@
     <div class="activity-item-manual">
         <p>Note: The fields marked with (*) are required</p>
         <form method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data" novalidate>
-            <p class="hidden failure">Please fix the error(s) below:</p>
             <input type="hidden" value="insert" name="action">
             <input type="hidden" value="" id="manual-import-category-id" name="category_id">
             <table width="50%" cellspacing="0" cellpadding="0" border="0" align="center">
@@ -61,18 +60,21 @@
                 <tr>
                     <td width="5%" valign="top" nowrap="nowrap"><label for="credit_date">Date *:</label></td>
                     <td width="60%">
-                        <input required class="dateplugin frm" type="text" size="30" name="credit_date" value="{$today}">
+                        <input title="Date" required class="dateplugin frm" type="text" size="30" name="credit_date"
+                               value="{$today}">
                     </td>
                 </tr>
                 <tr>
                     <td width="5%" valign="top" nowrap="nowrap"><label for="activity">Title of activity *:</label></td>
-                    <td width="60%"><input required type="text" size="30" class="frm" name="activity">
+                    <td width="60%">
+                        <input title="Title of Activity" required type="text" size="30" class="frm" name="activity">
                     </td>
                 </tr>
                 <tr>
                     <td width="5%" valign="top"><label for="credits">Number of hours *:</label></td>
                     <td width="60%">
-                        <input type="text" required maxlength="4" size="30" class="frm" name="credits">
+                        <input title="Number of Hours" type="text" required maxlength="4" size="30" class="frm"
+                               name="credits">
                     </td>
                 </tr>
                 <tr>
@@ -80,11 +82,12 @@
                         <label for="notes">Notes and reflection on activity *:</label>
                     </td>
                     <td width="60%">
-                        <textarea class="frm" required rows="4" cols="39" name="notes"></textarea></td>
+                        <textarea title="Notes and Reflection" class="frm" required rows="4" cols="39"
+                                  name="notes"></textarea></td>
                 </tr>
                 <tr>
                     <td><label for="evidence">Evidence (optional):</label></td>
-                    <td><input type="file" name="evidence" id="evidence"></td>
+                    <td><input title="Evidence" type="file" name="evidence" id="evidence"></td>
                 </tr>
                 <tr>
                     <td colspan="2" align="center">

@@ -52,6 +52,7 @@ input.error,
 textarea.error {
     border-color: #EB1040 !important;
     border-width: 1px;
+    border-style: solid;
 }
 
 .inline {
