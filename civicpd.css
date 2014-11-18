@@ -251,8 +251,36 @@ SPAN.searchword { background-color:yellow; }
 
 /* Edit */
 
+.ui-widget {
+    border: 1px solid black;
+}
+
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-content, .ui-widget-header {
     color: #3E3E3E;
     font-family: helvetica;
     font-size: 0.95em;
+}
+
+.ui-widget-content tr {
+    background: #efefef;
+    background: rgba(0, 0, 0, 0.063);
+}
+
+.ui-widget-content tr td {
+    vertical-align: top;
+    padding: 4px 9px;
+    border: 1px solid #fff;
+    text-align: left;
+}
+
+.page-civicrm-civicpd input[type="text"],
+.page-civicrm-civicpd input[type="search"] {
+.page-civicrm-civicpd textarea {
+    margin: 2px 0;
+    padding: 4px;
+    border: 1px solid #ddd;
+}
+
+.page-civicrm-civicpd input[type="search"] {
+    margin: 2px 10px;
 }
