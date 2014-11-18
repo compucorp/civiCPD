@@ -274,7 +274,7 @@ SPAN.searchword { background-color:yellow; }
 }
 
 .page-civicrm-civicpd input[type="text"],
-.page-civicrm-civicpd input[type="search"] {
+.page-civicrm-civicpd input[type="search"],
 .page-civicrm-civicpd textarea {
     margin: 2px 0;
     padding: 4px;
