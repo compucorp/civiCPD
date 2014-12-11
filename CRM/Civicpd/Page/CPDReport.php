@@ -651,13 +651,15 @@ pdf format here.</p>'
     . civi_cpd_report_get_pdf_import($user_id)
     . '<p><em>' . civi_cpd_report_get_activity_upload_response() . '</em></p>';
 
-  $pdf_upload_table .= '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>'
-    . '<tr>'
-    . '<th width="40%">Date</th>'
-    . '<th width="40%">Hours</th>'
-    . '<th width="20%">Action</th>'
-    . '<th width="40%">&nbsp;</th>'
-    . '</tr>';
+  if ($dao->N > 0) {
+    $pdf_upload_table .= '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>'
+      . '<tr>'
+      . '<th width="40%">Date</th>'
+      . '<th width="40%">Hours</th>'
+      . '<th width="20%">Action</th>'
+      . '<th width="40%">&nbsp;</th>'
+      . '</tr>';
+  }
 
   while ($dao->fetch()) {
     $pdf_upload_table .= '<tr>' .
