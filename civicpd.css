@@ -268,7 +268,6 @@ SPAN.searchword { background-color:yellow; }
 
 .ui-widget-content tr td {
     vertical-align: top;
-    padding: 4px 9px;
     border: 1px solid #fff;
     text-align: left;
 }

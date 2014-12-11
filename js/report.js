@@ -18,9 +18,12 @@ jQuery(function(){
       }
     );
 
+    /**
+     * Configure the modal dialog for entering full CPD record
+     */
     cj('.activity-item').dialog({
         autoOpen: false,
-        minWidth: 460
+        minWidth: 500
     });
 
     /**
