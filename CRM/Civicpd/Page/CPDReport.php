@@ -528,7 +528,7 @@ function civi_cpd_report_import_full_cpd_pdf() {
 function civi_cpd_report_import_activity_evidence_pdf() {
   $fileName = NULL;
 
-  if (isset($_FILES["evidence"])) {
+  if (isset($_FILES['evidence']) && $_FILES['evidence']['type']) {
     if (CRM_Civicpd_Page_CPDReport::isFileTypeAllowed($_FILES['evidence']['type']) && isset($_POST['category_id'])) {
       $fileName = date('Y-m-d-s') . '-'
         . civi_cpd_report_get_contact_id()
@@ -718,15 +718,17 @@ function civi_cpd_report_insert_activity() {
                       credits,
                       evidence
                   )
-                  VALUES(
-                     '$contactId',
-                     '$categoryId',
-                     '$creditDate',
-                     '$credits',
-                     '$evidenceFileName'
-                  )";
+                  VALUES( %0, %1, %2, %3, %4 )";
 
-      CRM_Core_DAO::executeQuery($sql);
+      $params = array(
+        array($contactId, 'Integer'),
+        array($categoryId, 'Integer'),
+        array(str_replace('-', '', $creditDate), 'Date'),
+        array($credits, 'Float'),
+        array($evidenceFileName, 'String'),
+      );
+
+      CRM_Core_DAO::executeQuery($sql, $params);
       civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], TRUE);
 
       CRM_Core_Session::setStatus(' ', 'Full CPD record uploaded', 'success', array('expires' => 2000));
@@ -751,6 +753,8 @@ function civi_cpd_report_insert_activity() {
         CRM_Civicpd_Page_CPDReport::redirectToReport();
       }
 
+      $evidenceFileName = $evidenceFileName ?: 'NULL';
+
       $sql = "
             INSERT INTO civi_cpd_activities
             (
@@ -762,17 +766,19 @@ function civi_cpd_report_insert_activity() {
                 notes,
                 evidence
             )
-            VALUES(
-               '$contactId',
-               '$categoryId',
-               '$creditDate',
-               '$credits',
-               '$activity',
-               '$notes',
-               '$evidenceFileName'
-            )";
+            VALUES( %0, %1, %2, %3, %4, %5, %6 )";
 
-      CRM_Core_DAO::executeQuery($sql);
+      $params = array(
+        array($contactId, 'Integer'),
+        array($categoryId, 'Integer'),
+        array(str_replace('-', '', $creditDate), 'Date'),
+        array($credits, 'Float'),
+        array($activity, 'String'),
+        array($notes, 'String'),
+        array($evidenceFileName, 'String'),
+      );
+
+      CRM_Core_DAO::executeQuery($sql, $params);
       civi_cpd_report_set_add_activity_response('manual', $_POST['category_id'], TRUE);
     }
   }
