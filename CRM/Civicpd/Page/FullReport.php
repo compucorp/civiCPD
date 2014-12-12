@@ -186,21 +186,24 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 $report_table .= '<td>' . $dao->first_name . '</td>';
                 $csv_output .= $dao->last_name . ', ' . $dao->first_name . ', ';
 
-                if($organization_member_number_field == 'civicrm_contact.user_unique_id'){
-                    $report_table .= '<td>' . $dao->user_unique_id . '</td>';
-                    $csv_output .= $dao->user_unique_id . ', ';
-                }
+//                if($organization_member_number_field == 'civicrm_contact.user_unique_id'){
+//                    $report_table .= '<td>' . $dao->user_unique_id . '</td>';
+//                    $csv_output .= $dao->user_unique_id . ', ';
+//                }
 //                elseif($organization_member_number_field == 'civicrm_membership.id') {
 //                    $report_table .= '<td>' . $dao->membership_id . '</td>';
 //                    $csv_output .= $dao->membership_id . ', ';
 //                }
-                else {
-                    $report_table .= '<td>' . $dao->external_identifier . '</td>';
-                    $csv_output .= $dao->external_identifier . ', ';
-                }
+//                else {
+//                    $report_table .= '<td>' . $dao->external_identifier . '</td>';
+//                    $csv_output .= $dao->external_identifier . ', ';
+//                }
 
                 $report_table .= '<td>' . $dao->member_type . '</td>';
-                $report_table .= '<td>' . $dao->member_since . '</td>';
+                $memberSince = $dao->member_since
+                  ? DateTime::createFromFormat('Y-m-d', $dao->member_since)->format('d-m-Y')
+                  : '';
+                $report_table .= '<td>' . $memberSince . '</td>';
                 $csv_output .= $dao->member_type . ', ' . $dao->member_since . ', ';
 
                 $sql = "SELECT civi_cpd_categories.id AS id" .
