@@ -115,7 +115,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         '<th class="head" nowrap>Approve</th>' .
         '<th class="head" nowrap>Last Name</th>' .
         '<th class="head" nowrap>First Name</th>' .
-        '<th class="head" nowrap>Member Number</th>' .
+//        '<th class="head" nowrap>Member Number</th>' .
         '<th class="head" nowrap>Membership Type</th>' .
         '<th class="head" nowrap>Member Since</th>' .
         '<th class="head" nowrap>Uploaded Activity</th>' .
@@ -190,10 +190,11 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                     $report_table .= '<td>' . $dao->user_unique_id . '</td>';
                     $csv_output .= $dao->user_unique_id . ', ';
                 }
-                elseif($organization_member_number_field == 'civicrm_membership.id') {
-                    $report_table .= '<td>' . $dao->membership_id . '</td>';
-                    $csv_output .= $dao->membership_id . ', ';
-                } else {
+//                elseif($organization_member_number_field == 'civicrm_membership.id') {
+//                    $report_table .= '<td>' . $dao->membership_id . '</td>';
+//                    $csv_output .= $dao->membership_id . ', ';
+//                }
+                else {
                     $report_table .= '<td>' . $dao->external_identifier . '</td>';
                     $csv_output .= $dao->external_identifier . ', ';
                 }
