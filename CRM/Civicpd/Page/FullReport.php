@@ -200,7 +200,10 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
 //                }
 
                 $report_table .= '<td>' . $dao->member_type . '</td>';
-                $report_table .= '<td>' . civi_crm_report_convert_mysql_to_uk_date($dao->member_since) . '</td>';
+                $memberSince = $dao->member_since
+                  ? DateTime::createFromFormat('Y-m-d', $dao->member_since)->format('d-m-Y')
+                  : '';
+                $report_table .= '<td>' . $memberSince . '</td>';
                 $csv_output .= $dao->member_type . ', ' . $dao->member_since . ', ';
 
                 $sql = "SELECT civi_cpd_categories.id AS id" .
