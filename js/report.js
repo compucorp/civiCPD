@@ -23,7 +23,7 @@ jQuery(function(){
      */
     cj('.activity-item').dialog({
         autoOpen: false,
-        minWidth: 500
+        minWidth: 600
     });
 
     /**
