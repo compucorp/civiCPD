@@ -192,6 +192,15 @@ jQuery(function(){
         cj('.activity-item').dialog('close');
     });
 
+    /**
+     * Add text for printer friendly link
+     */
+    cj('#printer-friendly').find('a')
+      .addClass('button')
+      .prepend('<i class="icon print-icon"></i>Print this year\'s record')
+      .find('div')
+      .hide();
+
     cj('#branding div.breadcrumb').html('<a href="/">Home</a> » <a href="/civicrm' +
         '/user">Contact Dashboard</a> » CPD Reporting'); 
 
