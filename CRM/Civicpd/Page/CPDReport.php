@@ -654,8 +654,8 @@ pdf format here.</p>'
   if ($dao->N > 0) {
     $pdf_upload_table .= '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>'
       . '<tr>'
-      . '<th width="40%">Date</th>'
-      . '<th width="40%">Hours</th>'
+      . '<th width="40%">Date Uploaded</th>'
+      . '<th width="40%">Total Hours in Uploaded Record</th>'
       . '<th width="20%">Action</th>'
       . '<th width="40%">&nbsp;</th>'
       . '</tr>';
