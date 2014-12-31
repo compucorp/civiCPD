@@ -121,7 +121,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         '<th class="head" nowrap>Uploaded Activity</th>' .
         '<th class="head" nowrap>Total Hours</th>';
 
-    $csv_hdr = 'Last Name, First Name, Member Number, Membership Type, Member Since, ';
+    $csv_hdr = 'Last Name, First Name, Display Name, Contact ID, Email, Membership Type, Member Since, ';
 
     for($x =0; $x < count($arr_categories); $x++ ) {
     	$report_table .= '<th class="head" nowrap>' . $arr_categories[$x]["category"] .
@@ -129,18 +129,22 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         $csv_hdr .= $arr_categories[$x]["category"] . ', ';
     }
 
-    $csv_hdr .= 'Total Hours';
+    $csv_hdr .= 'Total Hours, Uploaded Activity, Approved';
     $report_table .= '</tr>';
     $sql = "
         SELECT civicrm_contact.id,
             civicrm_contact.last_name,
             civicrm_contact.first_name,
+            civicrm_contact.display_name,
             civicrm_contact.external_identifier,
             civicrm_contact.user_unique_id,
             civicrm_membership.membership_type_id,
             civicrm_membership.id AS membership_id,
             civicrm_membership.join_date AS member_since,
-            civicrm_membership_type.name AS member_type
+            civicrm_membership_type.name AS member_type,
+            civicrm_email.email,
+            activities.credit_date,
+            activities.evidence
 
         FROM civicrm_contact
 
@@ -152,6 +156,16 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
 
         LEFT JOIN civicrm_membership_status
             ON civicrm_membership_status.id = civicrm_membership.status_id
+
+        LEFT JOIN civicrm_email
+            ON ( civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1 )
+
+        LEFT JOIN civi_cpd_activities AS activities
+            ON (
+                activities.contact_id = civicrm_contact.id
+                AND activities.category_id = " . CPD_FULL_CPD_CATEGORY_ID . "
+                AND YEAR(activities.credit_date) = " . $_SESSION['report_year'] . "
+            )
 
         WHERE
             civicrm_contact.first_name IS NOT NULL
@@ -176,15 +190,16 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
     while ($dao->fetch()) {
         if(!is_null($dao->last_name) || !is_null($dao->first_name)) {
             if(in_array ( $dao->membership_type_id , $arr_membership_types ) && $dao->id != $last_contact_id) {
-
+                $approved = CRM_Civicpd_Page_CPDReport::getApprovalStatus($dao->id);
                 $last_contact_id = $dao->id;
                 $report_table .= '<tr>';
                 $report_table .= '<td><input class="approve" type="checkbox"';
-                $report_table .= CRM_Civicpd_Page_CPDReport::getApprovalStatus($dao->id) ? ' checked="checked" ' : ' ';
+                $report_table .= $approved ? ' checked="checked" ' : ' ';
                 $report_table .= 'data-cid="' . $dao->id . '"/></td>';
                 $report_table .= '<td><a href="/civicrm/contact/view?cid=' . $dao->id . '">' . $dao->last_name . '</a></td>';
                 $report_table .= '<td>' . $dao->first_name . '</td>';
-                $csv_output .= $dao->last_name . ', ' . $dao->first_name . ', ';
+                $csv_output .= $dao->last_name . ', ' . $dao->first_name . ', ' . $dao->display_name . ', ';
+                $csv_output .= $dao->id . ', ' . $dao->email . ', ';
 
 //                if($organization_member_number_field == 'civicrm_contact.user_unique_id'){
 //                    $report_table .= '<td>' . $dao->user_unique_id . '</td>';
@@ -228,24 +243,20 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                     $csv_output .= abs($subdao->credits) . ', ';
                 }
 
-                $report_table .= '<td>';
+                $report_table .= '<td><a href="' . '">' . '</a></td>';
 
-                $uploads = scandir(CPD_DIR . 'uploads/activity/');
-
-                foreach($uploads as $upload) {
-                    if (substr($upload, 11) == $dao->id . '.pdf') {
-                            $upload_date = substr($upload, 0, 10);
-                            $report_table .= '<a href="/civicrm/civicpd/report&action=download_pdf&upload_id=' .
-                                substr($upload, 0, -4) . '">' . date("M d, Y", strtotime($upload_date)) .
-                                '</a></td>';
-                    }
-                }
-
-                $report_table .= '</td>';
                 $report_table .= '<td class="total-credits">' . $total_credits . '</td>';
+                $report_table .= '<td>';
+                $report_table .= $dao->evidence
+                  ? '<a target="_blank" href="' . civi_cpd_report_get_full_cpd_pdf_url($dao->evidence) . '"> '
+                        . civi_crm_report_convert_mysql_to_uk_date($dao->credit_date) . '</a>'
+                  : '';
+                $report_table .= '</td>';
                 $report_table .= $sub_cells;
                 $report_table .= '</tr>';
-                $csv_output .= $total_credits . "\n";
+                $csv_output .= $total_credits  . ', ';
+                $csv_output .= ($dao->evidence ? civi_crm_report_convert_mysql_to_uk_date($dao->credit_date) : '') . ', ';
+                $csv_output .= ($approved ? 'Yes' : 'No') . "\n";
             }
        	}
     }
