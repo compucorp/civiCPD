@@ -1,15 +1,22 @@
+<div="civitopbar"><h1>Manage Your Professional Development</h1></div>
+
+<div class="civileftcolumn">
 <h3>Review and update your {$civi_cpd_long_name} activities.
 {if $approved }
     <img style="/*display: block; position: absolute; top: 23px; left: 215px;*/ height: 30px;" src="{$imageUrl}"
          alt="Approved" title="Approved"/>
 {/if}
 </h3>
-
-<table id="category-list" width="100%" cellspacing="0" cellpadding="0" border="0">
+<table width="100%"><tr>
+              <td nowrap="nowrap">{$display_name}</td>
+              <td nowrap="nowrap">Membership Number: {$membership_number}</td>
+              <td nowrap="nowrap">Date: {$today}</td>
+            </tr></table>
+<table id="category-list" width="60%" cellspacing="0" cellpadding="0" border="0">
   <tbody>
   	<tr valign="top">
             <th nowrap="">{$civi_cpd_long_name} Activities for: <select class="cpd-frm" name="select_year" id="select_year">{$select_years}</select>
-            <p class="cpd-message">This report is for the year {$smarty.session.report_year}. To choose another year to report, click on the year above.</p></th>
+            <p class="cpd-message">This report is for the year {$smarty.session.report_year}. To choose another year to report, click on the year above.</p></th><tr><th nowrap="">{$civi_cpd_short_name} hours for activities undertakenin the calendar year {$smarty.session.report_year}: <strong>{$total_credits}</strong></th></tr>
         </tr>
         <tr valign="top"><td>&nbsp;</td></tr>
 
@@ -34,7 +41,7 @@
         </table>
       </td>
     </tr>
-    <tr valign="top">
+    <tr valign="top"><h3>Here</h3>
       <td>{$uploaded_activity_list}</td>
     </tr>
     <tr valign="top">
@@ -47,6 +54,8 @@
 <div id="progressbar" class="ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
     <div class="ui-progressbar-value ui-widget-header ui-corner-left ui-corner-right" style="display: block; width: 20em; height: 1em;"></div>
 </div>
+</div>
+
 
 
 <div class="activity-item" title="Add new activity record">
