@@ -1,5 +1,8 @@
 jQuery(function(){
-       
+
+    // Initialise notification
+    cj('#crm-notification-container').notify();
+
     cj.fn.center = function () {
         this.css('position', 'fixed');
         this.css('top', (cj(window).height() / 2) - (this.outerHeight() / 2));
@@ -149,6 +152,14 @@ jQuery(function(){
 
     var handleValidationSuccess = function (form) {
         var errorBlock = form.find('.errors').first();
+
+        var fileFields = form.find('input[type="file"]');
+        cj.each(fileFields, function (index, field) {
+            var fieldObj = cj(field);
+            if (fieldObj.val()) {
+              CRM.alert('Please wait...', 'Uploading file', 'crm-msg-loading', {expires: 0});
+            }
+        });
 
         if (errorBlock.length) {
             errorBlock.remove();
