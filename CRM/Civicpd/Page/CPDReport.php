@@ -662,8 +662,10 @@ pdf format here.</p>'
   }
 
   while ($dao->fetch()) {
+    $uploadDate = substr($dao->evidence, 0, strrpos($dao->evidence, '-'));
+
     $pdf_upload_table .= '<tr>' .
-      '<td width="40%" valign="top">' . date("M d, Y", strtotime($dao->credit_date)) . '</td>' .
+      '<td width="40%" valign="top">' . date("M d, Y", strtotime($uploadDate)) . '</td>' .
       '<td width="40%" valign="top">' . abs($dao->credits) . '</td>' .
       '<td width="20%" valign="top">
           <a href="' . civi_cpd_report_get_full_cpd_pdf_url($dao->evidence) . '" target="_blank"> view </a>';
@@ -703,7 +705,7 @@ function civi_cpd_report_insert_activity() {
     ) {
       $contactId = civi_cpd_report_get_contact_id();
       $categoryId = $_POST['category_id'];
-      $creditDate = date('Y-m-d');
+      $creditDate = $_SESSION['report_year'] . '-01-01';
       $credits = number_format($_POST['full_cpd_credits'], 2, '.', '');
       $evidenceFileName = civi_cpd_report_import_full_cpd_pdf();
 
