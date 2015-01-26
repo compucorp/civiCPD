@@ -7,12 +7,12 @@
          alt="Approved" title="Approved"/>
 {/if}
 </h3>
-<table width="100%"><tr>
+<table><tr>
               <td nowrap="nowrap">{$display_name}</td>
               <td nowrap="nowrap">Membership Number: {$membership_number}</td>
               <td nowrap="nowrap">Date: {$today}</td>
             </tr></table>
-<table id="category-list" width="60%" cellspacing="0" cellpadding="0" border="0">
+<table id="category-list" cellspacing="0" cellpadding="0" border="0">
   <tbody>
   	<tr valign="top">
             <th nowrap="">{$civi_cpd_long_name} Activities for: <select class="cpd-frm" name="select_year" id="select_year">{$select_years}</select>
@@ -28,13 +28,13 @@
     </tr>
     <tr valign="top">
       <td nowrap="">
-        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+        <table cellspacing="0" cellpadding="0" border="0">
           <tbody>
             <tr>
               <td nowrap="nowrap">{$display_name}</td>
-              <td width="3%" nowrap="nowrap">&nbsp;</td>
+              <td nowrap="nowrap">&nbsp;</td>
               <td nowrap="nowrap">Membership Number: {$membership_number}</td>
-              <td width="3%" nowrap="nowrap">&nbsp;</td>
+              <td nowrap="nowrap">&nbsp;</td>
               <td nowrap="nowrap">Date: {$today}</td>
             </tr>
           </tbody>
@@ -64,33 +64,33 @@
         <form method="post" action="/civicrm/civicpd/report" enctype="multipart/form-data" novalidate>
             <input type="hidden" value="insert" name="action">
             <input type="hidden" value="" id="manual-import-category-id" name="category_id">
-            <table width="50%" cellspacing="0" cellpadding="0" border="0" align="center">
+            <table cellspacing="0" cellpadding="0" border="0" align="center">
                 <tbody>
                 <tr>
-                    <td width="5%" valign="top" nowrap="nowrap"><label for="credit_date">Date *:</label></td>
-                    <td width="60%">
+                    <td valign="top" nowrap="nowrap"><label for="credit_date">Date *:</label></td>
+                    <td>
                         <input title="Date" required class="dateplugin frm" type="text" size="30" name="credit_date"
                                value="{$today}">
                     </td>
                 </tr>
                 <tr>
-                    <td width="5%" valign="top" nowrap="nowrap"><label for="activity">Title of activity *:</label></td>
-                    <td width="60%">
+                    <td valign="top" nowrap="nowrap"><label for="activity">Title of activity *:</label></td>
+                    <td>
                         <input title="Title of Activity" required type="text" size="30" class="frm" name="activity">
                     </td>
                 </tr>
                 <tr>
-                    <td width="5%" valign="top"><label for="credits">Number of hours *:</label></td>
-                    <td width="60%">
+                    <td valign="top"><label for="credits">Number of hours *:</label></td>
+                    <td>
                         <input title="Number of Hours" type="text" required maxlength="4" size="30" class="frm"
                                name="credits">
                     </td>
                 </tr>
                 <tr>
-                    <td width="5%" valign="top" nowrap="nowrap">
+                    <td valign="top" nowrap="nowrap">
                         <label for="notes">Notes and reflection on activity *:</label>
                     </td>
-                    <td width="60%">
+                    <td>
                         <textarea title="Notes and Reflection" class="frm" required rows="4" cols="39"
                                   name="notes"></textarea></td>
                 </tr>
