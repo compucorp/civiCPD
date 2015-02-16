@@ -559,14 +559,9 @@ function civi_cpd_report_get_activity_table($category_id) {
     $activity_table = '<div id="category-' . $category_id . '-activities" class="activity-list hidden">' .
 
         civi_cpd_report_get_edit_activity_response($category_id) .
-
-        '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="CPDactivityTable"><tr>' .
-
-        '<th width="10%">Date</th><th width="8%">Hours</th><th width="20%">Activity</th>' .
-
-        '<th width="35%">Reflection</th><th width="12%">Evidence</th><th width="15%">Action</th></tr>';
-
-
+        '<table border="0" cellspacing="0" cellpadding="0" class="CPDactivityTable"><tr>' .
+        '<th>Date</th><th>Hours</th><th>Activity</th>' .
+        '<th>Reflection</th><th>Evidence</th><th>Action</th></tr>';
 
     if ($dao->N > 0) {
 
@@ -1313,19 +1308,12 @@ function civi_cpd_report_get_uploaded_activity_list($user_id) {
 
 
   if ($dao->N > 0) {
-
-    $pdf_upload_table .= '<table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody>'
-
+    $pdf_upload_table .= '<table border="0" cellspacing="0" cellpadding="0"><tbody>'
       . '<tr>'
-
-      . '<th width="40%">Date Uploaded</th>'
-
-      . '<th width="40%">Total Hours in Uploaded Record</th>'
-
-      . '<th width="20%">Action</th>'
-
-      . '<th width="40%">&nbsp;</th>'
-
+      . '<th>Date Uploaded</th>'
+      . '<th>Total Hours in Uploaded Record</th>'
+      . '<th>Action</th>'
+      . '<th>&nbsp;</th>'
       . '</tr>';
 
   }
@@ -1333,15 +1321,12 @@ function civi_cpd_report_get_uploaded_activity_list($user_id) {
 
 
   while ($dao->fetch()) {
+    $uploadDate = substr($dao->evidence, 0, strrpos($dao->evidence, '-'));
 
     $pdf_upload_table .= '<tr>' .
-
-      '<td width="40%" valign="top">' . date("M d, Y", strtotime($dao->credit_date)) . '</td>' .
-
-      '<td width="40%" valign="top">' . abs($dao->credits) . '</td>' .
-
-      '<td width="20%" valign="top">
-
+      '<td valign="top">' . date("M d, Y", strtotime($uploadDate)) . '</td>' .
+      '<td valign="top">' . abs($dao->credits) . '</td>' .
+      '<td valign="top">
           <a href="' . civi_cpd_report_get_full_cpd_pdf_url($dao->evidence) . '" target="_blank"> view </a>';
 
 
@@ -1415,9 +1400,7 @@ function civi_cpd_report_insert_activity() {
       $contactId = civi_cpd_report_get_contact_id();
 
       $categoryId = $_POST['category_id'];
-
-      $creditDate = date('Y-m-d');
-
+      $creditDate = $_SESSION['report_year'] . '-01-01';
       $credits = number_format($_POST['full_cpd_credits'], 2, '.', '');
 
       $evidenceFileName = civi_cpd_report_import_full_cpd_pdf();
@@ -1795,19 +1778,14 @@ function civi_cpd_report_set_editable_activity() {
                 <input type="hidden" value="'. $dao->id .'" name="category_id">
 
                 <input type="hidden" value="'. $activity_id .'" name="activity_id">
-
-                <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
-
+                <table cellspacing="0" cellpadding="0" border="0" align="center">
                    <h3>Update Activity:</h3>
 
                     <tbody>
 
                         <tr>
-
-                            <td width="5%" valign="top" nowrap="nowrap">Date:</td>
-
-                            <td width="60%">
-
+                            <td valign="top" nowrap="nowrap">Date:</td>
+                            <td>
                                 <input type="text" size="30" class="frm dateplugin" ' .
 
                                     'name="credit_date"
@@ -1819,41 +1797,29 @@ function civi_cpd_report_set_editable_activity() {
                         </tr>
 
                         <tr>
-
-                            <td width="5%" valign="top" nowrap="nowrap">Activity:</td>
-
-                            <td width="60%"><input type="text" size="30" class="frm" ' . 
-
+                            <td valign="top" nowrap="nowrap">Activity:</td>
+                            <td><input type="text" size="30" class="frm" ' .
                             'name="activity" value="' . $dao->activity . '"></td>				
 
                         </tr>
 
                         <tr>
-
-                            <td width="15%" valign="top">Hours:</td>
-
-                            <td width="60%"><input type="text" maxlength="4" size="30" ' . 
-
+                            <td valign="top">Hours:</td>
+                            <td><input type="text" maxlength="4" size="30" ' .
                             'class="frm" name="credits" value="' . $dao->credits . '"></td>
 
                         </tr>
 
                         <tr>
-
-                            <td width="5%" valign="top" nowrap="nowrap">Reflection:</td>
-
-                            <td width="60%"><textarea class="frm" rows="4" cols="39" ' . 
-
+                            <td valign="top" nowrap="nowrap">Reflection:</td>
+                            <td><textarea class="frm" rows="4" cols="39" ' .
                             'name="notes">' . $dao->notes . '</textarea></td>
 
                         </tr>
 
                         <tr>
-
-                            <td width="5%" valign="top" nowrap="nowrap">Evidence (optional):</td>
-
-                            <td width="60%">' . $evidenceHtml . '</td>
-
+                            <td valign="top" nowrap="nowrap">Evidence (optional):</td>
+                            <td>' . $evidenceHtml . '</td>
                         </tr>
 
                         <tr>

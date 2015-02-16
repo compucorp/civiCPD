@@ -3,7 +3,7 @@
 <form action={crmURL p="civicrm/civicpd/categories"} method="post">
   <input type="hidden" value="{$id}" name="catid">
   <input type="hidden" value="{$action}" name="action">
-  <table width="500" border="0" cellspacing="5" cellpadding="5">
+  <table border="0" cellspacing="5" cellpadding="5">
     <tr>
       <td>Category:</td>
       <td><input type="text" name="category" id="category" value="{$category}" class="required" /></td>

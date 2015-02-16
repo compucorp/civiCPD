@@ -167,6 +167,11 @@ jQuery(function(){
     };
 
     /**
+     * Hide activity lists by default
+     */
+    cj('.activity-list').hide();
+
+    /**
      * Show/hide activities within a category upon clicking on the category title
      */
     cj('.category-title').on('click', function (e) {
@@ -204,13 +209,9 @@ jQuery(function(){
     });
 
     /**
-     * Add text for printer friendly link
+     * Hide printer friendly link as IES already has a custom one
      */
-    cj('#printer-friendly').find('a')
-      .addClass('button')
-      .prepend('<i class="icon print-icon"></i>Print this year\'s record')
-      .find('div')
-      .hide();
+    cj('#printer-friendly').hide();
 
     cj('#branding div.breadcrumb').html('<a href="/">Home</a> » <a href="/civicrm' +
         '/user">Contact Dashboard</a> » CPD Reporting'); 
