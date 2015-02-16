@@ -556,7 +556,7 @@ function civi_cpd_report_get_activity_table($category_id) {
 
 
 
-    $activity_table = '<div id="category-' . $category_id . '-activities" class="activity-list hidden">' .
+    $activity_table = '<div id="category-' . $category_id . '-activities" class="activity-list">' .
 
         civi_cpd_report_get_edit_activity_response($category_id) .
         '<table border="0" cellspacing="0" cellpadding="0" class="CPDactivityTable"><tr>' .
