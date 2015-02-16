@@ -1,285 +1,892 @@
 /* Remove CRM Status from CPD Pages */
+
 body.page-civicrm-civicpd .crm-footer .status {
+
     display: none;
+
 }
+
+
 
 /* Remove Footer from CPD Pages for BCSLA */
+
 body.page-civicrm-civicpd .crm-footer {
+
     display: none;
+
 }
 
+
+
 /* Hide Progress Bar and cover */
+
 body.page-civicrm-civicpd #progressbar,
+
 body.page-civicrm-civicpd #cover {
+
 	display: none;
+
 	position: fixed;
+
 }
+
+
 
 /* Report Page */
 
 
+
+
+
 #report_year {
+
     display: inline-block;
+
     margin-left: 5px;
+
     position: relative;
+
 }
+
+
 
 p.cpd-message {
+
     font-style: italic;
+
     font-weight: normal;
+
 }
+
 .edit-activity-response {
+
 margin: 10px 0 10px 0;
+
 }
+
+
 
 #category-list tr {
+
 margin-top: 400px;
+
 }
+
+
 
 #edit-response{
+
     margin: 10px 0;
+
 }
+
+
 
 .success {
+
    color:#14CC21;
+
 }
+
+
 
 .failure {
+
    color:#EB1040;
+
 }
+
+
 
 input.error,
+
 textarea.error {
+
     border-color: #EB1040 !important;
+
     border-width: 1px;
+
     border-style: solid;
+
 }
 
+
+
 .inline {
+
     display: inline !important;
+
     float: none !important;
+
 }
+
+
 
 .activity-item-manual {}
 
+
+
 .activity-item-import {
+
 margin: 0 10% 0 10%;
+
 float: right;
+
 width: 30%;
+
 height: 200px;
+
 }
+
+
 
 .add-new-category,
+
 .activity-item-import-pdf,
+
 .activity-item,
+
 .activity-list {}
 
+
+
 .activity-item-import-pdf {}
+
 .activity-item-import-pdf input {
+
     margin-right: 10px;
+
 }
+
 .activity-item-import-pdf #file {
-    width: 165px;
+
+    /** width: 165px; **/
+
 }
+
+
 
 .category-title {
+
     cursor: pointer;
+
     position: relative;
+
 }
+
+
 
 .category-title .button {
+
     position: absolute;
+
     top: 0;
+
     right: 0;
+
 }
+
+
 
 .toggle-activity-list {
-    background: no-repeat center -11px;
-    text-indent: -9999em;
+
+    
+
+    /* text-indent: -9999em; */
+
     display: block;
+
     float: left;
-    width: 19px;
+
+    width: 50px;
+
     height: 19px;
+
     margin-right: 5px;
+
+	padding-left:13px;
+
+	background:left -9px no-repeat;
+
+	font-size:60%;
+
+	
+
 }
+
+
 
 .toggle-activity-list.contracted {
-    background-position: center 5px;
+
+    background-position: left 8px;
+
 }
+
+
 
 body.page-civicrm-civicpd input {
+
    font-size: inherit !important;
+
 }
+
+
 
 .crm-form-block {
+
     padding: 20px !important;
+
 }
+
 .crm-form-block table {
+
     margin-bottom: 0;
+
 }
+
+
 
 .crm-form-block tr td, tr th {
+
     border: none;
+
 }
+
+
 
 .hidden {
+
     display: none;
+
 }
+
+
 
 .clear{
+
 clear:both;}
+
  
+
 .graphcont {
+
     color: #000;
+
     font-weight: 700;
+
     margin: 0 0 2rem;
+
 }
+
+
 
 .graph {
+
 background-color:#cecece;
+
 position:relative;
+
 padding:0
+
 }
+
+
 
 .graph .bar {
+
     display: block;
+
     position: relative;
+
     text-align: center;
+
     color: #fff;
+
     height: 25px;
+
     font-family: Arial, Helvetica, sans-serif;
+
     font-size: 12px;
+
     line-height: 2;
-    box-shadow: 1px 0px 5px rgba(100, 100, 100, 0.75);
+
+	max-width:100%;
+
+   /* box-shadow: 1px 0px 5px rgba(100, 100, 100, 0.75);*/
+
 }
+
  
+
 .graph .bar span {
+
 position:absolute;
+
 left:1em
+
 }
+
+
 
 .graph .marker {
+
     display: block;
+
     border-right: 2px solid #cecece;
+
     position: absolute;
+
     height: 25px;
+
     top: 25px;
+
     margin-left: -2px;
+
     color: darkgreen;
+
 }
+
+
 
 .graph .marker span {
+
     position: absolute;
+
     right: 5px;
+
     bottom: -4px;
+
     color: #aaa;
+
     text-align: right;
+
     display: block;
+
     min-width: 5rem;
+
 }
 
+
+
 .fileUpload {
+
 	position: relative;
+
 	overflow: hidden;
+
 	margin: 10px;
+
 }
+
 .fileUpload input.upload {
+
 	position: absolute !important;
+
 	top: 0 !important;
+
 	right: 0 !important;
+
 	margin: 0 !important;
+
 	padding: 0 !important;
+
 	font-size: 20px !important;
+
 	cursor: pointer !important;
+
 	opacity: 0 !important;
+
 	filter: alpha(opacity=0) !important;
+
 }
+
+
 
 /* Full Report */
 
+
+
 #button{
+
 cursor:pointer;
+
 background-color: white;
+
 color: grey;
+
 font-family: Helvetica,Arial,Sans;
+
     font-size: 10px;
+
 }
+
+
+
 
 
 #crm-container p {
+
     font-family: Helvetica,Arial,Sans;
+
     font-size: 12px;
+
     margin-bottom: 4px;
+
     padding: 4px 6px;
+
 }
+
+
 
 #crm-container table.report-table {
+
     border-collapse: inherit;
+
     width: 100%;
+
 }
+
+
 
 #crm-container table.report-table th {
+
     background-color: #EFEFEF;
+
     border: 1px solid #CCCCCC;
+
     color: #666666;
-}
- 
-#crm-container table.report-table td {
-    border: 1px solid #EFEFEF;
+
 }
 
-#report_year {
-    display: inline-block;
-    margin-left: 5px;
-    position: relative;
+ 
+
+#crm-container table.report-table td {
+
+    border: 1px solid #EFEFEF;
+
 }
+
+
+
+#report_year {
+
+    display: inline-block;
+
+    margin-left: 5px;
+
+    position: relative;
+
+}
+
+
 
 SPAN.searchword { background-color:yellow; }
 
+
+
 .sortable {
+
     width:823px; border:1px solid #ccc; border-bottom:none
+
 }
 
+
+
 .sortable .head,
+
 .sortable .desc, 
+
 .sortable .asc {
+
     cursor:pointer;
+
 }
+
 .sortable .head:hover, .sortable .desc:hover, .sortable .asc:hover {
+
     color:black
+
 }
+
+
 
 /* Edit */
 
+
+
 .ui-widget {
+
     border: 1px solid black;
+
 }
+
+
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-content, .ui-widget-header {
+
     color: #3E3E3E;
+
     font-family: helvetica;
+
     font-size: 0.95em;
+
 }
+
+
 
 .ui-widget-content tr {
+
     background: #efefef;
+
     background: rgba(0, 0, 0, 0.063);
+
 }
+
+
 
 .ui-widget-content tr td {
+
     vertical-align: top;
+
     border: 1px solid #fff;
+
     text-align: left;
+
 }
+
+
 
 .page-civicrm-civicpd input[type="text"],
+
 .page-civicrm-civicpd input[type="search"],
+
 .page-civicrm-civicpd textarea {
+
     margin: 2px 0;
+
     padding: 4px;
+
     border: 1px solid #ddd;
+
 }
 
+
+
 .page-civicrm-civicpd input[type="search"] {
+
     margin: 2px 10px;
+
 }
+
+
+
+
+
+/** TG edits **/
+
+
+
+/** CPD form **/
+
+.CPDapprovedBlock {
+
+	display:block;
+
+	color: #5C6944;
+
+	padding:10px;
+
+	background:#E8EFDA;
+
+	overflow:auto;
+
+	margin-top:10px;
+
+}
+
+
+
+.CPDapprovedIcon {
+
+	margin:0 0 0 10px;
+
+	float:right;
+
+}
+
+
+
+.CPDapprovedText {
+
+	display:block;
+
+	margin-top:10px;
+
+	
+
+}
+
+.cpdMinTarget{
+
+	font-size:70%;
+
+	line-height:120%;
+
+}
+
+
+
+.graph .marker {
+
+	height:25px !important;
+
+}
+
+
+
+
+
+.category-title .button {
+
+	
+
+	-webkit-appearance: none;
+
+	-moz-appearance: normal;
+
+	appearance: normal;
+
+
+
+}
+
+
+
+.CPDnewActivityItem {
+
+	float:right;
+
+	background:url(../../themes/ies_theme/images/icons/iconAddMedium.gif) top left no-repeat;
+
+	padding-left:43px;
+
+	width:15%;
+
+	min-width:100px;
+
+	text:110%;
+
+		
+
+}
+
+
+
+.CPDactivityTable {
+
+		
+
+}
+
+
+
+.CPDactivityTable td{
+
+	padding:5px 5px 5px 0px;
+
+}
+
+
+
+
+
+.CPDTableHeading th{
+
+	padding-top:5px;
+
+}
+
+
+
+.CPDReportTitle{
+
+	/**
+
+	 padding:5px 0 5px 0;
+
+	margin:5px 0 5px 0;
+
+	**/
+
+}
+
+
+
+.CPDHours {
+
+	display:inline-block;
+
+	color:white;
+
+	background-color:#F79406;
+
+	padding:15px;
+
+	margin: 7px 0;
+
+	border-radius:50px;
+
+	font-size:200%;
+
+}
+
+
+
+.CPDText {
+
+	font-size:200%;
+
+	display:inline-block;
+
+	margin-left:.5em;
+
+}
+
+
+
+.CPDSidebar {
+
+	width: 30%;
+
+	float: right;
+
+	margin-right: 40px;
+
+	float:right;
+
+	font-size:85%;
+
+}
+
+
+
+.CPDSidebar h3{
+
+	
+
+	
+
+}
+
+
+
+.CPDSidebar h2 {
+
+	display: block;
+
+	background-color: #F0F0F0;
+
+	border: thin solid #D8D8D8;
+
+	border-left: none;
+
+	border-right: none;
+
+	border-bottom: none;
+
+	padding: 5px 20px 5px 20px;
+
+	color: #4F6782;
+
+	font-family: 'Montserrat',sans-serif;
+
+	font-size: 1.5em;
+
+	margin-bottom: .5em;
+
+	line-height: 1.5em;
+
+	clear: both;
+
+}
+
+
+
+.CPDSidebar .field-location,
+
+.CPDSidebar .field-time{
+
+	float:none;
+
+	width:auto;
+
+	padding-left:30px;
+
+	padding-top:2px;
+
+	background-position:0px 0px;
+
+}
+
+
+
+.CPDprintButton {
+
+	display:inline-block;
+
+	float:right;
+
+	font-size:70%;
+
+	background:url(../../themes/ies_theme/images/icons/iconPrintMedium.png) left center no-repeat;
+
+	padding:1px 0 0 26px;
+
+}
+
+
+
+.CPDindividualHours {
+
+	display:inline-block;
+
+	float:right;
+
+	font-size:60%;
+
+	padding:0 10px;
+
+	background:#4D4D4D;
+
+	color:white;
+
+	border-radius:20px;
+
+	margin-right:-15px;
+
+}
+
+
+
+
+
+@media screen and (device-width: 384px) and (device-height: 592px) and (-webkit-device-pixel-ratio: 2), 
+
+(max-width: 882px)
+
+{
+
+.CPDSidebar {
+
+	width: 100%;
+
+	float:none;
+
+	clear:both;
+
+	
+
+}
+
+}
+
