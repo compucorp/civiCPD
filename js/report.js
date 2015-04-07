@@ -96,11 +96,16 @@ jQuery(function(){
         var errors = [];
 
         if (input.attr('type') === 'file' && input.val()) {
-            if (input.val().split('.').pop().toLowerCase() !== 'pdf') {
+            if (!isFileTypeAllowed(input)) {
                 input.addClass('error');
 
                 validated = false;
                 errors.push('Only PDF file format is allowed for ' + input.attr('title'));
+            } else if (hasFileSizeExceeded(input)) {
+                input.addClass('error');
+
+                validated = false;
+                errors.push('Only maximum file size of 5MB is allowed for ' + input.attr('title'));
             } else {
                 input.removeClass('error');
             }
@@ -122,6 +127,16 @@ jQuery(function(){
             errors: errors
         };
     };
+
+    var isFileTypeAllowed = function(input) {
+        return input.val().split('.').pop().toLowerCase() === 'pdf';
+    }
+
+    var hasFileSizeExceeded = function(input) {
+        var fileToUpload = input[0].files[0];
+
+        return fileToUpload && fileToUpload.size > 5242880;
+    }
 
     /**
      * Handle the event when form validation fails
