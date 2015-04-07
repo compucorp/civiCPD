@@ -39,6 +39,7 @@ body.page-civicrm-civicpd #cover {
     background: white;
     width: 15em;
     box-shadow: 1px 1px 5px #ccc;
+    z-index: 10;
 }
 
 #crm-notification-container .ui-notify-close {
