@@ -1000,7 +1000,6 @@ function civi_cpd_report_import_full_cpd_pdf() {
   $fileName = NULL;
 
 
-
   if (isset($_FILES["file"])) {
 
     if (CRM_Civicpd_Page_CPDReport::isFileTypeAllowed($_FILES['file']['type'])) {
@@ -1014,13 +1013,17 @@ function civi_cpd_report_import_full_cpd_pdf() {
 
 
       $path = civi_cpd_report_get_full_cpd_pdf_path($fileName);
+      
+      if ( ! move_uploaded_file($_FILES['file']['tmp_name'], $path)) {
+          CRM_Core_Session::setStatus(
+              'File could not be saved (possibly incorrect filesystem permissions)', 
+              'Failed to save full CPD record', 
+              'error', 
+              array('expires' => 2000)
+          );
 
-      $fileName = move_uploaded_file($_FILES['file']['tmp_name'], $path)
-
-        ? $fileName
-
-        : NULL;
-
+          return FALSE;
+      }
     }
 
     else {
@@ -1028,7 +1031,6 @@ function civi_cpd_report_import_full_cpd_pdf() {
       CRM_Core_Session::setStatus('File type not allowed', 'Failed to save full CPD record', 'error',
 
         array('expires' => 2000));
-
 
 
       return FALSE;
