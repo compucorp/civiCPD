@@ -46,17 +46,6 @@
 
             </tr>
 
-            <tr>
-
-        <td>
-
-        If you have already recorded your CPD activities you can upload this at the <a href="#pdflink">bottom of the page</a>.
-
-        </td>
-
-        </tr>
-
-       
 
         <tr valign="top"><td>&nbsp;</td></tr>
 

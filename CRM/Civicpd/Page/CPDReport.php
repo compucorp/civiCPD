@@ -2230,6 +2230,7 @@ function civi_crm_report_get_content() {
 
    $i = 1;
 
+   $content = '<tr><td>If you have already recorded your CPD activities you can upload this at the <a href="#pdflink">bottom of the page</a>.</td></tr>';
 
 
    while ($dao->fetch()) {
