@@ -31,6 +31,29 @@ body.page-civicrm-civicpd #cover {
 }
 
 
+/* Notification box styling */
+#crm-notification-container {
+    position: fixed;
+    top: 6em;
+    right: 2em;
+    background: white;
+    width: 15em;
+    box-shadow: 1px 1px 5px #ccc;
+}
+
+#crm-notification-container .ui-notify-close {
+    position: absolute;
+    right: 1em;
+    top: 10px;
+}
+
+#crm-notification-container h1 {
+    margin: 0;
+}
+
+#crm-notification-container .notify-content {
+    padding: 5px 20px 5px 20px;
+}
 
 /* Report Page */
 
