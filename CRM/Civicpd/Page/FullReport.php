@@ -11,10 +11,14 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/table_filter.js', 0, 'page-header');
         CRM_Core_Resources::singleton()->addScriptFile('ca.lunahost.civicpd', 'js/full_report.js', 0, 'page-header');
 
+        // initialise CiviCRM session object
+        $session = CRM_Core_Session::singleton();
+
         if (isset($_POST)) {
             $out = '';
 
             if (isset($_POST['csv_hdr'])) {
+                // CSV header
                 $out .= $_POST['csv_hdr'];
                 $out .= "\n";
 
@@ -24,10 +28,23 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
 
                 $filename = 'CPD Full Report' . '_' . date("Y-m-d",time());
 
+                // IES-7:Fixed by obsulete these lines
+                /* 
                 header("Content-type: application/vnd.ms-excel");
                 header("Content-disposition: csv" . date("Y-m-d") . ".csv");
                 header("Content-disposition: filename=".$filename.".csv");
                 print $out;
+                */
+
+                $csvResult = $session->get("cpdCsvExport");
+                if(isset($csvResult)){
+                    // Prepare header
+                    $header = explode(', ', $_POST['csv_hdr']);
+                    // Generate CSV using CiviCRM function
+                    CRM_Core_Report_Excel::writeCSVFile($filename, $header, $csvResult);
+                    CRM_Utils_System::civiExit();
+                }
+
                 exit();
            }
 
@@ -121,14 +138,16 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         '<th class="head" nowrap>Uploaded Activity</th>' .
         '<th class="head" nowrap>Total Hours</th>';
 
+    //CSV Header
     $csv_hdr = 'Last Name, First Name, Display Name, Contact ID, Email, Membership Type, Member Since, ';
 
     for($x =0; $x < count($arr_categories); $x++ ) {
-    	$report_table .= '<th class="head" nowrap>' . $arr_categories[$x]["category"] .
+        $report_table .= '<th class="head" nowrap>' . $arr_categories[$x]["category"] .
             '</th>';
         $csv_hdr .= $arr_categories[$x]["category"] . ', ';
     }
 
+    //CSV Header
     $csv_hdr .= 'Total Hours, Uploaded Activity, Approved';
     $report_table .= '</tr>';
     $sql = "
@@ -184,9 +203,11 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         "-01-01'";
 
     $tempQuery = 'CREATE TEMPORARY TABLE civi_cpd_activities_temp1 AS ' . $tempsql;
+
     CRM_Core_DAO::executeQuery($tempQuery);
     $csv_output = "";
 
+    //Populate and format result into table tag
     while ($dao->fetch()) {
         if(!is_null($dao->last_name) || !is_null($dao->first_name)) {
             if(in_array ( $dao->membership_type_id , $arr_membership_types ) && $dao->id != $last_contact_id) {
@@ -219,7 +240,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                   ? DateTime::createFromFormat('Y-m-d', $dao->member_since)->format('d-m-Y')
                   : '';
                 $report_table .= '<td>' . $memberSince . '</td>';
-                $csv_output .= $dao->member_type . ', ' . $dao->member_since . ', ';
+                $csv_output .= $dao->member_type . ', ' . $dao->member_since . ', ';            
 
                 $sql = "SELECT civi_cpd_categories.id AS id" .
                     ", civi_cpd_categories.category AS category" .
@@ -243,6 +264,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                     $csv_output .= abs($subdao->credits) . ', ';
                 }
 
+
                 $report_table .= '<td><a href="' . '">' . '</a></td>';
 
                 $report_table .= '<td class="total-credits">' . $total_credits . '</td>';
@@ -257,16 +279,38 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 $csv_output .= $total_credits  . ', ';
                 $csv_output .= ($dao->evidence ? civi_crm_report_convert_mysql_to_uk_date($dao->credit_date) : '') . ', ';
                 $csv_output .= ($approved ? 'Yes' : 'No') . "\n";
+                
             }
-       	}
+        }
     }
 
+    // Compose result for CiviCRM CSV Export function
+    $civiCSVResult = array();
+    $csvOutputs = explode("\n", $csv_output);
+    foreach ($csvOutputs as $key => $item) {
+        // Prepare values
+        $csvItem = explode(", ", $item);
+        $csvRow = array();
+        // Prepare header
+        $csvHeaders = explode(", ", $csv_hdr);
+        foreach ($csvHeaders as $key => $field) {
+            // Map header with value
+            $csvRow[$field] = $csvItem[$key];
+        }
+        // Put row in list
+        $civiCSVResult[] = $csvRow;
+    }
+
+    // Store in session
+    $session->set("cpdCsvExport",$civiCSVResult);
+
+    // Prepare result for CSV export
     $report_table .= '</table>';
     $export_table = '<div id="export-csv"><form name="export" action="/civicrm/civicpd/fullreport" method="POST">
         <input type="submit" value="Export to CSV" id="button" alt="Export Search Results to CSV File"/>
         <input type="hidden" value="' . $csv_hdr . '" name="csv_hdr"/>
-        <input type="hidden" value="' . $csv_output . '" name="csv_output"/>
         </form></div>';
+        // <input type="hidden" value="' . $csv_output . '" name="csv_output"/>
 
     $this->assign( 'export_table', $export_table );
     CRM_Utils_System::setTitle(ts('Review ' . $short_name . ' Full Report'));
