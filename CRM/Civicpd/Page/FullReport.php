@@ -151,6 +151,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
         //CSV Header
         $csv_hdr .= 'Total Hours, Uploaded Document, Approved';
         $report_table .= '</tr>';
+                // civicrm_membership_type.name AS member_type,
         $sql = "
             SELECT civicrm_contact.id,
                 civicrm_contact.last_name,
@@ -161,7 +162,9 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 civicrm_membership.membership_type_id,
                 civicrm_membership.id AS membership_id,
                 civicrm_membership.join_date AS member_since,
-                civicrm_membership_type.name AS member_type,
+                
+                group_concat(civicrm_membership_type.name, ' ' ORDER BY civicrm_membership_type.name ASC) as member_type,
+
                 civicrm_email.email,
                 activities.credit_date,
                 activities.evidence
@@ -192,17 +195,13 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 AND civicrm_contact.last_name IS NOT NULL
                 AND civicrm_membership_status.name <> 'Expired'
 
+    GROUP BY civicrm_contact.id 
+
             ORDER BY civicrm_contact.last_name";
 
         $dao = CRM_Core_DAO::executeQuery($sql);
         $last_contact_id = "";
         $arr_members = array();
-
-        //DEBUG
-        // print_r("<pre>");
-        // print_r($sql);
-        // print_r("</pre>");
-        // die();
 
         $tempsql = "SELECT * FROM civi_cpd_activities WHERE civi_cpd_activities." .
             "credit_date >= '" . $_SESSION["report_year"] . "-01-01' AND " .
@@ -254,7 +253,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                         ", SUM(civi_cpd_activities_temp1.credits) AS credits" .
                         ", civi_cpd_categories.minimum" .
                         ", civi_cpd_categories.description " .
-                        // "FROM civi_cpd_categories " .
+                        // Fixed IES-46: CPD Report shows incorrect activity hours
                         "FROM (SELECT * FROM civi_cpd_categories ".
                         "UNION ALL ".
                         "SELECT 0 as id, 'Upload activity' as category, 'Uploaded Activity' as description, 100 as minimum, null as maximum) as civi_cpd_categories ".
