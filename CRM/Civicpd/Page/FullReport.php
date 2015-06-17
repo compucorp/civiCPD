@@ -161,7 +161,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 civicrm_contact.user_unique_id,
                 civicrm_membership.membership_type_id,
                 civicrm_membership.id AS membership_id,
-                civicrm_membership.join_date AS member_since,
+                MIN(civicrm_membership.join_date) AS member_since,
                 
                 group_concat(civicrm_membership_type.name, ' ' ORDER BY civicrm_membership_type.name ASC) as member_type,
 
@@ -195,9 +195,9 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 AND civicrm_contact.last_name IS NOT NULL
                 AND civicrm_membership_status.name <> 'Expired'
 
-    GROUP BY civicrm_contact.id 
+            GROUP BY civicrm_contact.id 
 
-            ORDER BY civicrm_contact.last_name";
+            ORDER BY civicrm_contact.last_name ";
 
         $dao = CRM_Core_DAO::executeQuery($sql);
         $last_contact_id = "";
