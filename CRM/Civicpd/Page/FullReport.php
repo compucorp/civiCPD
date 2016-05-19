@@ -193,7 +193,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
             WHERE
                 civicrm_contact.first_name IS NOT NULL
                 AND civicrm_contact.last_name IS NOT NULL
-                AND civicrm_membership_status.name <> 'Expired'
+                AND civicrm_membership_status.name NOT IN ('Expired', 'Deceased', 'Resigned')
 
             GROUP BY civicrm_contact.id 
 
