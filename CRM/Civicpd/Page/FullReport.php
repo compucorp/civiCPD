@@ -194,7 +194,7 @@ class CRM_Civicpd_Page_FullReport extends CRM_Core_Page {
                 civicrm_contact.first_name IS NOT NULL
                 AND civicrm_contact.last_name IS NOT NULL
                 AND civicrm_membership_status.name NOT IN ('Expired', 'Deceased', 'Resigned')
-
+                AND civicrm_membership.join_date < DATE('".$_SESSION["report_year"]."-01-01')
             GROUP BY civicrm_contact.id 
 
             ORDER BY civicrm_contact.last_name ";
