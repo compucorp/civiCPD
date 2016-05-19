@@ -1814,7 +1814,7 @@ function civi_cpd_report_set_editable_activity() {
 
                         <tr>
                             <td valign="top" nowrap="nowrap">Reflection:</td>
-                            <td><textarea class="frm" rows="4" cols="39" ' .
+                            <td><textarea maxlength="10000" class="frm" rows="4" cols="39" ' .
                             'name="notes">' . $dao->notes . '</textarea></td>
 
                         </tr>
@@ -2132,11 +2132,18 @@ function civi_cpd_report_no_activities_action() {
 
     $activity_list .= '<td valign="top">';
 
-    $activity_list .= $dao->evidence
+     /**
+      * Because the evidence field has been set to an actual string (value of "NULL") when
+      * there is no evidence (rather than an actual NULL value) we need to do extra checks.
+      * Also, when evidence is deleted, the value becomes a string of zero length. Fun!
+      */
+     if (isset($dao->evidence) && !empty($dao->evidence) && $dao->evidence !== 'NULL') {
+         $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>';
+     } else {
+         $evidence_link = '(no evidence provided)';
+     }
 
-      ? '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>'
-
-      : '';
+     $activity_list .= $evidence_link;
 
     $activity_list .= '</td>';
 
