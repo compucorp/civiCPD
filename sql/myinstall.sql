@@ -24,7 +24,7 @@ CREATE  TABLE IF NOT EXISTS civi_cpd_activities (
   credit_date DATETIME NOT NULL ,
   credits DECIMAL(6,2) NOT NULL ,
   activity VARCHAR(45) NOT NULL ,
-  notes VARCHAR(255) NULL ,
+  notes VARCHAR(10000) NULL ,
   approved TINYINT NOT NULL DEFAULT 0 ,
   evidence VARCHAR(255) NULL ,
   PRIMARY KEY (id, contact_id, category_id) )
