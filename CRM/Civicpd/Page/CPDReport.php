@@ -2128,7 +2128,7 @@ function civi_cpd_report_no_activities_action() {
 
     $activity_list .= '<td valign="top">' . $dao->activity . '</td>';
 
-    $activity_list .= '<td valign="top">' . $dao->notes . '</td>';
+    $activity_list .= '<td valign="top"><div class="notes-render">' . $dao->notes . '</div></td>';
 
     $activity_list .= '<td valign="top">';
 
