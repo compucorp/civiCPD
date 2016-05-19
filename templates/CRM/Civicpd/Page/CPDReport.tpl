@@ -179,7 +179,7 @@
 
                     </td>
                     <td>
-                        <textarea title="Notes and Reflection" class="frm" required rows="4" cols="39"
+                        <textarea maxlength="10000" title="Notes and Reflection" class="frm" required rows="4" cols="39"
 
                                   name="notes"></textarea></td>
 
