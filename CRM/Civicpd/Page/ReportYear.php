@@ -7,7 +7,7 @@
 	  
 	  // This script is called via jQuery.post() and sets the session year variable 
 	  if(isset($_REQUEST['new_year'])) {
-		$new_year = $_REQUEST['new_year'];
+		$new_year = preg_replace('/[^0-9]/', '', $_REQUEST['new_year']);
 		$_SESSION['report_year'] = $new_year;
 		$output = 1;
 	  } else {
