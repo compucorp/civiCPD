@@ -17,9 +17,15 @@
             <tr>
                 <td>Job Title: {$job_title}</td>
                 <td>Membership Types:
-                    {foreach from=$membership_types item=type}
-                        {$type},
-                    {/foreach}</td>
+                    {foreach from=$membership_types key=myId item=type name=types}
+                        {if !$smarty.foreach.types.last}
+                            {$type},
+                            {else}
+                            {$type}
+                        {/if}
+                    {/foreach}
+
+                   </td>
             </tr>
         </table>
     </div>
