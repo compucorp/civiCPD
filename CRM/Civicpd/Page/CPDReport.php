@@ -479,7 +479,7 @@ function civi_cpd_report_get_activity_table($category_id)
         civi_cpd_report_get_edit_activity_response($category_id) .
         '<table border="0" cellspacing="0" cellpadding="0" class="CPDactivityTable"><tr>' .
         '<th>Date</th><th>Hours</th><th>Activity</th>' .
-        '<th>Reflection</th><th>Evidence</th><th>Action</th></tr>';
+        '<th>Reflection</th><th>Evidence</th>'. (isPrintView() ? '' : '<th>Action</th>') .'</tr>';
 
     if ($dao->N > 0) {
 
@@ -1967,15 +1967,16 @@ function civi_cpd_report_get_activities_list($dao)
 
     $activity_list .= '</td>';
 
-    $activity_list .= '<td valign="top">';
+    if (!isPrintView()) {
+
+        $activity_list .= '<td valign="top">';
 
 
-    $member_update_limit = civi_crm_report_get_member_update_limit();
+        $member_update_limit = civi_crm_report_get_member_update_limit();
 
 
-    if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit == 0) {
+        if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit == 0) {
 
-        if (!isPrintView()) {
 
             $activity_list .= '<a href="/civicrm/civicpd/report?action=edit&activity_id=' .
 
@@ -1984,16 +1985,16 @@ function civi_cpd_report_get_activities_list($dao)
             $activity_list .= '<a class="delete" href="/civicrm/civicpd/report?action=delete&activity_id=' .
 
                 $dao->activity_id . '&category_id=' . $dao->category_id . '">delete</a>';
+
+        } else {
+
+            $activity_list .= 'locked';
+
         }
 
-    } else {
-
-        $activity_list .= 'locked';
+        $activity_list .= '</td></tr>';
 
     }
-
-
-    $activity_list .= '</td></tr>';
 
 
     return $activity_list;
