@@ -1,0 +1,78 @@
+@media print{
+    @page {
+        size: landscape
+    }
+}
+
+body {
+
+}
+
+#page {
+    width: 99%;
+    margin: 0 auto; padding: 0;
+    background: none;
+}
+
+#cpd-header {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    display: inline-block;
+}
+
+
+#cpd-personal-details {
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    display: inline-block;
+}
+
+#cpd-ies-logo {
+    height: 120px;
+    width: auto;
+    float: right;
+    display: inline-block;
+    margin-top: -50px;
+    margin-right: 50px;
+}
+
+#cpd-personal-details table,
+#cpd-hours-summary table,
+#cpd-summary table {
+    border-style: none;
+}
+
+#cpd-personal-details tr>td,
+#cpd-hours-summary tr>td {
+    font-size: 1.5em;
+    padding: 10px;
+}
+
+#category-list > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(1) {
+    display: none;
+}
+
+.CPDactivityTable td {
+    padding: 5px 5px 5px 5px !important;
+}
+
+.CPDactivityTable th {
+    color: black;
+}
+
+
+
+.CPDactivityTable table,
+.CPDactivityTable th,
+.CPDactivityTable td {
+    border-collapse: collapse !important;
+    border: 2px solid black !important;
+}
+
+.category-title {
+    text-align: left;
+}
+
+
