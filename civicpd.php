@@ -221,6 +221,18 @@ function civicpd_civicrm_pageRun( &$page ) {
     }
 }
 
+/**
+ * Implementation of hook_civicrm_alterTemplateFile
+ * 
+ */
+function civicpd_civicrm_alterTemplateFile($formName, &$form, $context, &$tplName) {
+    
+    if ($formName == 'CRM_Civicpd_Page_CPDReport' && isset($_GET['snippet'])) {
+        CRM_Core_Resources::singleton()->addStyleFile('ca.lunahost.civicpd', 'civicpd-print.css');
+        $tplName = civicpd_getExtensionDir() . 'templates/CRM/Civicpd/Print/CPDPrintReport.tpl';
+    }
+}
+
 
 /**
  * Implementation of hook_civicrm_install
