@@ -1975,7 +1975,7 @@ function civi_cpd_report_get_activities_list($dao)
 
     if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit == 0) {
 
-        if (!isset($_GET['snippet'])) {
+        if (!isPrintView()) {
 
             $activity_list .= '<a href="/civicrm/civicpd/report?action=edit&activity_id=' .
 
@@ -2102,5 +2102,18 @@ function civi_cpd_report_validate_number($var)
 
     }
 
+}
+
+/**
+ * Determines if the request was for the print version of the report
+ *
+ * @return bool
+ */
+function isPrintView()
+{
+    if (isset($_GET['snippet'])) {
+        return true;
+    }
+    return false;
 }
 
