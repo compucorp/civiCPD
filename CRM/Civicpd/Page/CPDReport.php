@@ -1975,13 +1975,16 @@ function civi_cpd_report_get_activities_list($dao)
 
     if ($_SESSION['report_year'] > (date("Y") - $member_update_limit) || $member_update_limit == 0) {
 
-        $activity_list .= '<a href="/civicrm/civicpd/report?action=edit&activity_id=' .
+        if (!isset($_GET['snippet'])) {
 
-            $dao->activity_id . '&category_id=' . $dao->category_id . '">edit</a> | ';
+            $activity_list .= '<a href="/civicrm/civicpd/report?action=edit&activity_id=' .
 
-        $activity_list .= '<a class="delete" href="/civicrm/civicpd/report?action=delete&activity_id=' .
+                $dao->activity_id . '&category_id=' . $dao->category_id . '">edit</a> | ';
 
-            $dao->activity_id . '&category_id=' . $dao->category_id . '">delete</a>';
+            $activity_list .= '<a class="delete" href="/civicrm/civicpd/report?action=delete&activity_id=' .
+
+                $dao->activity_id . '&category_id=' . $dao->category_id . '">delete</a>';
+        }
 
     } else {
 
