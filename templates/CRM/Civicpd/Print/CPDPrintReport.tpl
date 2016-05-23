@@ -52,6 +52,12 @@
     </div>
     <!-- End of CPD summary listing section -->
 
+    <!-- Full upload hours section -->
+    <div id="full-upload-hours">
+        Additional hours uploaded by PDF:  {$full_upload_hours} hours
+    </div>
+    <!-- End of full upload hours section -->
+
 </div> <!-- End of page div -->
 
 
@@ -68,8 +74,6 @@
                 '.activity-item-import-pdf',
                 '.uploaded-activity-response',
                 '.rating',
-                '.activity-list td:nth-child(5)',
-                '.activity-list th:nth-child(5)',
                 '.ui-progressbar-value.ui-widget-header.ui-corner-left.ui-corner-right',
                 '.toggle-activity-list',
                 '.new-activity-item',
