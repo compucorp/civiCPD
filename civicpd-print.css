@@ -66,11 +66,33 @@ body {
 .CPDactivityTable th,
 .CPDactivityTable td {
     border-collapse: collapse !important;
-    border: 2px solid black !important;
+    border: 1px solid black !important;
 }
 
 .category-title {
     text-align: left;
+    margin-bottom: 5px;
+    margin-top: 5px;
+
 }
 
+.category {
+    border: 1px solid black;
+    margin-top: 10px;
+}
 
+.CPDindividualHours {
+    margin: 0 !important;
+    color: #000000 !important;
+    background: none !important;
+    font-size: .95em;
+}
+
+td {
+   width: 200px;
+}
+
+.print-hour-counter {
+    float: right;
+    margin-right: 20px;
+}
