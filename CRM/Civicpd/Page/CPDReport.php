@@ -121,6 +121,8 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page
         $this->assign('job_title', civi_crm_report_get_job_title());
 
         $this->assign('membership_types', civi_crm_report_get_membership_types());
+        
+        $this->assign('full_upload_hours', civi_cpd_report_get_full_upload_hours());
 
 
         civi_cpd_report_unset_session();
@@ -333,6 +335,14 @@ function civi_cpd_report_get_category($dao)
 
     $member_update_limit = civi_crm_report_get_member_update_limit();
 
+    if (isPrintView()) {
+        $count_class = 'print-hour-counter';
+        $count_output = number_format($dao->credits, 2) . ' hours';
+    } else {
+        $count_class = 'CPDindividualHours';
+        $count_output = number_format($dao->credits, 2) . 'h';
+    }
+
 
     $category = '<tr id="category-' . $dao->id . '" class="category" valign="top">
 
@@ -344,7 +354,7 @@ function civi_cpd_report_get_category($dao)
 
         <a href class="toggle-activity-list" style="background-image: url(' . CPD_PATH . '/assets/collapse-sprite.gif)">Show</a>'
 
-        . $dao->category . '<div class="CPDindividualHours">' . number_format($dao->credits, 2) . 'h</div>';
+        . $dao->category . '<div class="'.$count_class.'">'.$count_output.'</div>';
 
 
     $category .= '</h1>';
@@ -1113,6 +1123,8 @@ function civi_cpd_report_get_full_cpd_pdf_url($fileName)
 
 function civi_cpd_report_get_uploaded_activity_list($user_id)
 {
+    
+    $full_upload_hours = 0;
 
     $sql = "
 
@@ -1198,12 +1210,20 @@ function civi_cpd_report_get_uploaded_activity_list($user_id)
 
 
         $pdf_upload_table .= '</td></tr>';
+        
+        $full_upload_hours .= $dao->credits;
 
     }
 
 
     $pdf_upload_table .= '</tbody></table>';
 
+
+    /**
+     * Horrible hack to provide the total hours by uploaded PDF, otherwise
+     * we duplicate code which is not desirable..
+     */
+    $_SESSION['civi_crm_report']['full_upload_hours'] = $full_upload_hours;
 
     return $pdf_upload_table;
 
@@ -1913,6 +1933,14 @@ function civi_cpd_report_get_contact_id()
 
 }
 
+function civi_cpd_report_get_full_upload_hours()
+{
+    if(isset($_SESSION['civi_crm_report']['full_upload_hours'])) {
+        return $_SESSION['civi_crm_report']['full_upload_hours'];
+    }
+    return 0;
+}
+
 
 function civi_cpd_report_no_activities_action()
 {
@@ -1958,7 +1986,13 @@ function civi_cpd_report_get_activities_list($dao)
      * Also, when evidence is deleted, the value becomes a string of zero length. Fun!
      */
     if (isset($dao->evidence) && !empty($dao->evidence) && $dao->evidence !== 'NULL') {
-        $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>';
+        if (isPrintView()) {
+            // If IES want just the full URL, comment out the line below and un-comment the line after that
+             $evidence_link = $dao->evidence;
+            //$evidence_link = civi_cpd_report_get_evidence_pdf_url($dao->evidence); // un-comment me for full URL
+        } else {
+            $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>';
+        }
     } else {
         $evidence_link = '(no evidence provided)';
     }
