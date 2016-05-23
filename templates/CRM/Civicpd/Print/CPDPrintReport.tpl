@@ -77,7 +77,7 @@
                 '.ui-progressbar-value.ui-widget-header.ui-corner-left.ui-corner-right',
                 '.toggle-activity-list',
                 '.new-activity-item',
-                'a,p'
+                'p'
             ];
 
             for (var i = 0, len = hideElements.length; i < len; i++) {

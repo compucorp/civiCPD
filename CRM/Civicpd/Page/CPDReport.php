@@ -1987,9 +1987,8 @@ function civi_cpd_report_get_activities_list($dao)
      */
     if (isset($dao->evidence) && !empty($dao->evidence) && $dao->evidence !== 'NULL') {
         if (isPrintView()) {
-            // If IES want just the full URL, comment out the line below and un-comment the line after that
-             $evidence_link = $dao->evidence;
-            //$evidence_link = civi_cpd_report_get_evidence_pdf_url($dao->evidence); // un-comment me for full URL
+            $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">'
+                .civi_cpd_report_get_evidence_pdf_url($dao->evidence).'</a>';
         } else {
             $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>';
         }
