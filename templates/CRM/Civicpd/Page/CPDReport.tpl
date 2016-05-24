@@ -152,8 +152,7 @@
                 <tr id="start-date" class="hidden">
                     <td valign="top" nowrap="nowrap"><label for="start_date">Start date *:</label></td>
                     <td>
-                        <input id="start-dates" title="Start" required class="frm" type="text" size="30" name="start_date"
-                               value="{$today}">
+                        <input id="start-dates" title="Start" class="frm" type="text" size="30" name="start_date">
                     </td>
 
                 </tr>
@@ -292,6 +291,7 @@
     cj(function() {
         var year = {/literal}{$smarty.session.report_year}{literal}
         cj('#start-dates, #credit-date').datepicker({
+            dateFormat: 'dd-mm-yy',
             minDate: new Date(year, 0, 1),
             maxDate: new Date(year, 11, 31) }).value();
     });
@@ -304,13 +304,16 @@
     cj('.activity-days').click(function () {
         var start_date = '#start-date';
         var credit_date = 'label[for="credit_date"]';
+        var start_input = '#start-dates';
 
         if(cj('.activity-days:checked').val() == 'multiple') {
             cj(start_date).show();
             cj(credit_date).text('End date *:');
+            cj(start_input).prop('required', true);
         } else {
             cj(start_date).hide();
             cj(credit_date).text('Date *:');
+            cj(start_input).prop('required', false);
         }
     });
 
