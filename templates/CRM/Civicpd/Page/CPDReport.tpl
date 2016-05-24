@@ -152,7 +152,8 @@
                 <tr id="start-date" class="hidden">
                     <td valign="top" nowrap="nowrap"><label for="start_date">Start date *:</label></td>
                     <td>
-                        <input id="start-dates" title="Start" class="frm" type="text" size="30" name="start_date">
+                        <input id="start-dates" title="Start" class="restricted-date frm" type="text"
+                               size="30" name="start_date">
                     </td>
 
                 </tr>
@@ -160,7 +161,7 @@
                 <tr>
                     <td valign="top" nowrap="nowrap"><label for="credit_date">Date *:</label></td>
                     <td>
-                        <input id="credit-date" title="Date" required class="frm" type="text" size="30" name="credit_date"
+                        <input id="credit-date" title="Date" required class="frm restricted-date" type="text" size="30" name="credit_date"
                                value="{$today}">
                     </td>
 
@@ -290,7 +291,7 @@
 
     cj(function() {
         var year = {/literal}{$smarty.session.report_year}{literal}
-        cj('#start-dates, #credit-date').datepicker({
+        cj('.restricted-date').datepicker({
             dateFormat: 'dd-mm-yy',
             minDate: new Date(year, 0, 1),
             maxDate: new Date(year, 11, 31) }).value();
