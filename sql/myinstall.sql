@@ -21,7 +21,7 @@ CREATE  TABLE IF NOT EXISTS civi_cpd_activities (
   id INT NOT NULL AUTO_INCREMENT,
   contact_id INT NOT NULL ,
   category_id INT NOT NULL ,
-  start_date DATETIME NOT NULL ,
+  start_date DATETIME,
   credit_date DATETIME NOT NULL ,
   credits DECIMAL(6,2) NOT NULL ,
   activity VARCHAR(45) NOT NULL ,
