@@ -1647,7 +1647,7 @@ function civi_cpd_report_set_editable_activity()
                     <tr>
                             <td valign="top" nowrap="nowrap">Start date:</td>
                             <td>
-                                <input type="text" size="30" class="frm dateplugin" ' .
+                                <input type="text" size="30" class="frm restricted-date" ' .
 
             'name="start_date"
 
@@ -1660,7 +1660,7 @@ function civi_cpd_report_set_editable_activity()
                         <tr>
                             <td valign="top" nowrap="nowrap">Date / End date:</td>
                             <td>
-                                <input type="text" size="30" class="frm dateplugin" ' .
+                                <input type="text" size="30" class="frm restricted-date" ' .
 
             'name="credit_date"
 
