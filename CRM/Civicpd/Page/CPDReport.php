@@ -1243,7 +1243,7 @@ function civi_cpd_report_insert_activity()
 
     }
 
-    if (isset($_POST['start_date']) && strlen($_POST['start_date'] > 0)) {
+    if (isset($_POST['start_date']) && !empty($_POST['start_date'])) {
         $_POST['start_date'] = civi_crm_report_convert_uk_to_mysql_date($_POST['start_date']);
     } else {
         // If start date wasn't set, then we set null
@@ -1451,10 +1451,20 @@ function civi_cpd_report_update_activity()
 
     }
 
+    if (isset($_POST['start_date']) && !empty($_POST['start_date'])) {
+        $_POST['start_date'] = civi_crm_report_convert_uk_to_mysql_date($_POST['start_date']);
+    } else {
+        // If start date wasn't set, then we set null
+        $_POST['start_date'] = null;
+    }
+
 
     if (!empty($_POST['activity_id']) && !empty($_POST['category_id']) && civi_cpd_report_validate_date($_POST['credit_date']) && civi_cpd_report_validate_number($_POST['credits']) && !empty($_POST['notes']) && !empty($_POST['activity'])) {
 
         $activityId = $_POST['activity_id'];
+
+        $startDate = (isset($_POST['start_date'])
+            && civi_cpd_report_validate_start_date($_POST['start_date']) ) ? $_POST['start_date'] : null;
 
         $creditDate = $_POST['credit_date'];
 
@@ -1481,6 +1491,8 @@ function civi_cpd_report_update_activity()
 
 
             SET
+            
+                start_date = '$startDate',
 
                 credit_date = '$creditDate',
 
@@ -1560,6 +1572,8 @@ function civi_cpd_report_set_editable_activity()
                 civi_cpd_categories.category,
 
                 civi_cpd_activities.id AS activity_id,
+                
+                civi_cpd_activities.start_date,
 
                 civi_cpd_activities.credit_date,
 
@@ -1626,6 +1640,20 @@ function civi_cpd_report_set_editable_activity()
                    <h3>Update Activity:</h3>
 
                     <tbody>
+                    
+                    
+                    <tr>
+                            <td valign="top" nowrap="nowrap">Start date:</td>
+                            <td>
+                                <input type="text" size="30" class="frm dateplugin" ' .
+
+            'name="start_date"
+
+                                    value=' . civi_crm_report_convert_mysql_to_uk_date($dao->start_date) . '>
+
+                             </td>
+
+                        </tr>
 
                         <tr>
                             <td valign="top" nowrap="nowrap">Date:</td>
