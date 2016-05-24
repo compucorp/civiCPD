@@ -455,6 +455,8 @@ function civi_cpd_report_get_activity_table($category_id)
     $sql = "SELECT civi_cpd_categories.category
 
         , civi_cpd_activities.id AS activity_id
+        
+        , civi_cpd_activities.start_date
 
         , civi_cpd_activities.credit_date
 
@@ -1656,7 +1658,7 @@ function civi_cpd_report_set_editable_activity()
                         </tr>
 
                         <tr>
-                            <td valign="top" nowrap="nowrap">Date:</td>
+                            <td valign="top" nowrap="nowrap">Date / End date:</td>
                             <td>
                                 <input type="text" size="30" class="frm dateplugin" ' .
 
@@ -2013,7 +2015,12 @@ function civi_cpd_report_get_activities_list($dao)
 
     $activity_list = '<tr>';
 
-    $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
+    if (isset($dao->start_date) && !empty($dao->start_date)) {
+        $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->start_date"))
+            . ' - ' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
+    } else {
+        $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
+    }
 
     $activity_list .= '<td valign="top">' . abs($dao->credits) . '</td>';
 
