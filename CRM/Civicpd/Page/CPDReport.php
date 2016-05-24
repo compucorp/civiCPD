@@ -1246,8 +1246,8 @@ function civi_cpd_report_insert_activity()
     if (isset($_POST['start_date']) && strlen($_POST['start_date'] > 0)) {
         $_POST['start_date'] = civi_crm_report_convert_uk_to_mysql_date($_POST['start_date']);
     } else {
-        // If start date wasn't set, then we use the credit date
-        $_POST['start_date'] = $_POST['credit_date'];
+        // If start date wasn't set, then we set null
+        $_POST['start_date'] = null;
     }
 
 
@@ -1332,7 +1332,7 @@ function civi_cpd_report_insert_activity()
 
             && civi_cpd_report_validate_date($_POST['credit_date'])
 
-            && civi_cpd_report_validate_date($_POST['start_date'])
+            && civi_cpd_report_validate_start_date($_POST['start_date'])
 
             && !empty($_POST['notes'])
 
@@ -2139,6 +2139,13 @@ function civi_cpd_report_validate_date($date)
 
     }
 
+}
+
+function civi_cpd_report_validate_start_date($date)
+{
+    if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date) || $date === null) {
+        return true;
+    }
 }
 
 
