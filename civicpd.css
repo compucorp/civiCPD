@@ -911,3 +911,7 @@ SPAN.searchword { background-color:yellow; }
 
 }
 
+/* Make the notes section on the report render correctly */
+.notes-render {
+    white-space: pre-wrap;
+}

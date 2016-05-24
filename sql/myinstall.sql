@@ -21,10 +21,11 @@ CREATE  TABLE IF NOT EXISTS civi_cpd_activities (
   id INT NOT NULL AUTO_INCREMENT,
   contact_id INT NOT NULL ,
   category_id INT NOT NULL ,
+  start_date DATETIME,
   credit_date DATETIME NOT NULL ,
   credits DECIMAL(6,2) NOT NULL ,
   activity VARCHAR(45) NOT NULL ,
-  notes VARCHAR(255) NULL ,
+  notes VARCHAR(10000) NULL ,
   approved TINYINT NOT NULL DEFAULT 0 ,
   evidence VARCHAR(255) NULL ,
   PRIMARY KEY (id, contact_id, category_id) )

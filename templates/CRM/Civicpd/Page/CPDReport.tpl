@@ -141,14 +141,28 @@
             <input type="hidden" value="" id="manual-import-category-id" name="category_id">
             <table cellspacing="0" cellpadding="0" border="0" align="center">
                 <tbody>
+                <tr>
+                    <td>No of days</td>
+                    <td><input class="activity-days" type="radio" name="activity-days" value="single"
+                               checked="checked">Single day
+                        <input class="activity-days" type="radio" name="activity-days"
+                               value="multiple">Multiple days</td>
+                </tr>
+
+                <tr id="start-date" class="hidden">
+                    <td valign="top" nowrap="nowrap"><label for="start_date">Start date *:</label></td>
+                    <td>
+                        <input id="start-dates" title="Start" class="restricted-date frm" type="text"
+                               size="30" name="start_date">
+                    </td>
+
+                </tr>
 
                 <tr>
                     <td valign="top" nowrap="nowrap"><label for="credit_date">Date *:</label></td>
                     <td>
-                        <input title="Date" required class="dateplugin frm" type="text" size="30" name="credit_date"
-
+                        <input id="credit-date" title="Date" required class="frm restricted-date" type="text" size="30" name="credit_date"
                                value="{$today}">
-
                     </td>
 
                 </tr>
@@ -179,7 +193,7 @@
 
                     </td>
                     <td>
-                        <textarea title="Notes and Reflection" class="frm" required rows="4" cols="39"
+                        <textarea maxlength="10000" title="Notes and Reflection" class="frm" required rows="4" cols="39"
 
                                   name="notes"></textarea></td>
 
@@ -247,10 +261,6 @@
 
 <script type="text/javascript">
 
-    <!-- 
-
-
-
     if (window.location.href.indexOf('snippet=2') != -1) {
 
         cj('.cpd-message').hide();
@@ -279,9 +289,35 @@
 
     }
 
+    cj(function() {
+        var year = {/literal}{$smarty.session.report_year}{literal}
+        cj('.restricted-date').datepicker({
+            dateFormat: 'dd-mm-yy',
+            minDate: new Date(year, 0, 1),
+            maxDate: new Date(year, 11, 31) }).value();
+    });
 
 
-    //-->
+
+    /**
+     * Allow selection of a date range for new activities
+     */
+    cj('.activity-days').click(function () {
+        var start_date = '#start-date';
+        var credit_date = 'label[for="credit_date"]';
+        var start_input = '#start-dates';
+
+        if(cj('.activity-days:checked').val() == 'multiple') {
+            cj(start_date).show();
+            cj(credit_date).text('End date *:');
+            cj(start_input).prop('required', true);
+        } else {
+            cj(start_date).hide();
+            cj(credit_date).text('Date *:');
+            cj(start_input).prop('required', false);
+        }
+    });
+
 
 </script>
 
