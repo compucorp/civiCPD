@@ -1243,6 +1243,13 @@ function civi_cpd_report_insert_activity()
 
     }
 
+    if (isset($_POST['start_date']) && strlen($_POST['start_date'] > 0)) {
+        $_POST['start_date'] = civi_crm_report_convert_uk_to_mysql_date($_POST['start_date']);
+    } else {
+        // If start date wasn't set, then we use the credit date
+        $_POST['start_date'] = $_POST['credit_date'];
+    }
+
 
     if (isset($_POST['category_id'])) {
 
@@ -1325,6 +1332,8 @@ function civi_cpd_report_insert_activity()
 
             && civi_cpd_report_validate_date($_POST['credit_date'])
 
+            && civi_cpd_report_validate_date($_POST['start_date'])
+
             && !empty($_POST['notes'])
 
             && !empty($_POST['activity'])
@@ -1336,6 +1345,8 @@ function civi_cpd_report_insert_activity()
             $categoryId = $_POST['category_id'];
 
             $creditDate = $_POST['credit_date'];
+
+            $startDate = $_POST['start_date'];
 
             $credits = number_format($_POST['credits'], 2, '.', '');
 
@@ -1365,6 +1376,8 @@ function civi_cpd_report_insert_activity()
                 contact_id,
 
                 category_id,
+                
+                start_date,
 
                 credit_date,
 
@@ -1378,7 +1391,7 @@ function civi_cpd_report_insert_activity()
 
             )
 
-            VALUES( %0, %1, %2, %3, %4, %5, %6 )";
+            VALUES( %0, %1, %2, %3, %4, %5, %6, %7 )";
 
 
             $params = array(
@@ -1386,6 +1399,8 @@ function civi_cpd_report_insert_activity()
                 array($contactId, 'Integer'),
 
                 array($categoryId, 'Integer'),
+
+                array(str_replace('-', '', $startDate), 'Date'),
 
                 array(str_replace('-', '', $creditDate), 'Date'),
 
