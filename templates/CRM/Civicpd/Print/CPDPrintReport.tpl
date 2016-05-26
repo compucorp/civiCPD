@@ -33,7 +33,7 @@
 
     <!-- CPD hours summary section -->
     <div id="cpd-hours-summary">
-        <table
+        <table>
         <tr>
             <td><strong>Total Hours: {$total_credits}</strong></td>
         </tr>
