@@ -1336,6 +1336,8 @@ function civi_cpd_report_insert_activity()
 
             && civi_cpd_report_validate_start_date($_POST['start_date'])
 
+            && civi_cpd_report_validate_date_ranges($_POST['start_date'], $_POST['credit_date'])
+
             && !empty($_POST['notes'])
 
             && !empty($_POST['activity'])
@@ -1458,6 +1460,11 @@ function civi_cpd_report_update_activity()
     } else {
         // If start date wasn't set, then we set null
         $_POST['start_date'] = null;
+    }
+
+    if (!civi_cpd_report_validate_date_ranges($_POST['start_date'], $_POST['credit_date'])) {
+        civi_cpd_report_set_edit_activity_response('update', $_POST['category_id'], FALSE);
+        return false;
     }
 
 
@@ -2181,6 +2188,22 @@ function civi_cpd_report_validate_start_date($date)
     if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date) || $date === null) {
         return true;
     }
+}
+
+
+function civi_cpd_report_validate_date_ranges($start, $end)
+{
+    if (!empty($start) && !empty($end)) {
+        if ($end > $start) {
+            return true;
+        }
+    }
+
+    if (empty($start) && !empty($end)) {
+        return true;
+    }
+
+    return false;
 }
 
 
