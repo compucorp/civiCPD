@@ -1474,7 +1474,7 @@ function civi_cpd_report_update_activity()
         $activityId = $_POST['activity_id'];
 
         $startDate = (isset($_POST['start_date'])
-            && civi_cpd_report_validate_start_date($_POST['start_date']) ) ? $_POST['start_date'] : null;
+            && civi_cpd_report_validate_start_date($_POST['start_date']) ) ? "start_date='".$_POST['start_date']."'," : "start_date=NULL,";
 
         $creditDate = $_POST['credit_date'];
 
@@ -1498,11 +1498,9 @@ function civi_cpd_report_update_activity()
 
             UPDATE civi_cpd_activities
 
-
-
             SET
-            
-                start_date = '$startDate',
+
+                ".$startDate."
 
                 credit_date = '$creditDate',
 
@@ -1617,7 +1615,7 @@ function civi_cpd_report_set_editable_activity()
 
         $evidenceHtml = null;
 
-        if ($dao->evidence) {
+        if (!empty($dao->evidence) && $dao->evidence!='NULL') {
 
             $evidenceUrl = civi_cpd_report_get_evidence_pdf_url($dao->evidence);
 
