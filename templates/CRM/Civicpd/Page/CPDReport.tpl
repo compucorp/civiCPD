@@ -295,6 +295,7 @@
             dateFormat: 'dd-mm-yy',
             minDate: new Date(year, 0, 1),
             maxDate: new Date(year, 11, 31) }).value();
+
     });
 
 
