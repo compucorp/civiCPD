@@ -18,6 +18,7 @@ class CRM_Civicpd_Page_CPDReport extends CRM_Core_Page
     static public $totalCredits = null;
 
 
+
     function run()
     {
 
@@ -2175,19 +2176,49 @@ function civi_crm_report_get_content()
 function civi_cpd_report_validate_date($date)
 {
 
-    if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date)) {
+    $pattern = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
 
-        return TRUE;
-
+    if (preg_match($pattern, $date)) {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        $d->format('Y');
+        if ($d->format('Y') === $_SESSION['report_year']) {
+            return true;
+        }
     }
 
+    // Absolutely not where we want to do this, but it isn't working in the spaghetti code above...
+
+    CRM_Core_Session::setStatus(
+        'The date you provided was invalid, please check it and try again',
+        'Failed to save record',
+        'error',
+        array('expires' => 2000)
+    );
 }
 
 function civi_cpd_report_validate_start_date($date)
 {
-    if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date) || $date === null) {
+    if($date === null) {
         return true;
     }
+
+    $pattern = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
+
+    $d = DateTime::createFromFormat('Y-m-d', $date);
+    $d->format('Y');
+
+    if ((preg_match($pattern, $date) && $d->format('Y') === $_SESSION['report_year'] )) {
+        return true;
+    }
+
+    // Absolutely not where we want to do this, but it isn't working in the spaghetti code above...
+
+    CRM_Core_Session::setStatus(
+        'The date you provided was invalid, please check it and try again',
+        'Failed to save record',
+        'error',
+        array('expires' => 2000)
+    );
 }
 
 
@@ -2203,7 +2234,14 @@ function civi_cpd_report_validate_date_ranges($start, $end)
         return true;
     }
 
-    return false;
+    // Absolutely not where we want to do this, but it isn't working in the spaghetti code above...
+
+    CRM_Core_Session::setStatus(
+        'The date range you provided is invalid, please check it and try again',
+        'Failed to save record',
+        'error',
+        array('expires' => 2000)
+    );
 }
 
 
