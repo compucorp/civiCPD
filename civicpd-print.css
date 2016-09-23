@@ -88,8 +88,22 @@ body {
     font-size: .95em;
 }
 
-td {
-   width: 200px;
+.CPDactivityTable .column1, .CPDactivityTable .column2 {
+    width: 50px !important;
+    margin: 0px 10px !important;
+}
+
+.CPDactivityTable .column3 {
+    width: 100px !important;
+}
+
+.CPDactivityTable .column5 {
+    width: 150px !important;
+}
+
+.CPDactivityTable .column5 a {
+    text-decoration: underline;
+    color: #0000ff;
 }
 
 .print-hour-counter {
