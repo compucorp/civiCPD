@@ -902,7 +902,7 @@ function civi_cpd_report_import_full_cpd_pdf()
 
         if (CRM_Civicpd_Page_CPDReport::isFileTypeAllowed($_FILES['file']['type'])) {
 
-            $fileName = date('Y-m-d')
+            $fileName = date('Y-m-d_His')
 
                 . '-' . civi_cpd_report_get_contact_id()
 
@@ -2022,19 +2022,19 @@ function civi_cpd_report_get_activities_list($dao)
     $activity_list = '<tr>';
 
     if (isset($dao->start_date) && !empty($dao->start_date)) {
-        $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->start_date"))
+        $activity_list .= '<td valign="top" class="column1">' . date("M d, Y", strtotime("$dao->start_date"))
             . ' - ' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
     } else {
-        $activity_list .= '<td valign="top">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
+        $activity_list .= '<td valign="top" class="column1">' . date("M d, Y", strtotime("$dao->credit_date")) . '</td>';
     }
 
-    $activity_list .= '<td valign="top">' . abs($dao->credits) . '</td>';
+    $activity_list .= '<td valign="top" class="column2">' . abs($dao->credits) . '</td>';
 
-    $activity_list .= '<td valign="top">' . $dao->activity . '</td>';
+    $activity_list .= '<td valign="top" class="column3">' . $dao->activity . '</td>';
 
-    $activity_list .= '<td valign="top"><div class="notes-render">' . $dao->notes . '</div></td>';
+    $activity_list .= '<td valign="top" class="column4"><div class="notes-render">' . $dao->notes . '</div></td>';
 
-    $activity_list .= '<td valign="top">';
+    $activity_list .= '<td valign="top" class="column5">';
 
     /**
      * Because the evidence field has been set to an actual string (value of "NULL") when
@@ -2043,8 +2043,7 @@ function civi_cpd_report_get_activities_list($dao)
      */
     if (isset($dao->evidence) && !empty($dao->evidence) && $dao->evidence !== 'NULL') {
         if (isPrintView()) {
-            $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">'
-                .civi_cpd_report_get_evidence_pdf_url($dao->evidence).'</a>';
+            $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">Link</a>';
         } else {
             $evidence_link = '<a target="_blank" href="' . civi_cpd_report_get_evidence_pdf_url($dao->evidence) . '">View</a>';
         }
