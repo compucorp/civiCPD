@@ -117,6 +117,10 @@ function civicpd_civicrm_pageRun( &$page ) {
     // Assign variables to the template using: $page->assign( 'varName', $varValue );
     // Get variables using: $page->getVar( 'varName' );
 
+    // make sure jquery.notify.js is added when user donot have access civiCRM permission
+    if($page->urlPath[1] == 'civicpd' && $page->urlPath[2] == 'report' && !CRM_Core_Permission::check('access CiviCRM')) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.notify.js', 10, 'html-header');
+    }
 
     /**
      * PULL THE DEFAULTS FROM THE DATABASE

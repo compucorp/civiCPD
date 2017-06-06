@@ -261,6 +261,24 @@
 
 <script type="text/javascript">
 
+    //Display popup when CiviCPD date range is wrong
+    CRM.$("td #start-dates, td #credit-date").on("change", function(){
+        var getStartdate = CRM.$("#start-dates").val().split("-");
+        var startDate = new Date(getStartdate[2],getStartdate[1]-1,getStartdate[0]);
+        var getEnddate = CRM.$("#credit-date").val().split("-");
+        var endDate = new Date(getEnddate[2],getEnddate[1]-1,getEnddate[0]);
+        var currentDate = new Date().getFullYear()
+
+
+        if ((startDate.getTime() > endDate.getTime()) || (getStartdate[2] != currentDate) || (getEnddate[2] != currentDate)) {
+            CRM.alert("The date range you provided is invalid, please check it and try again", '', 'date-alert', {expires:5000});
+            CRM.$('.date-alert').parent().css('height', '0');
+            CRM.$('.date-alert h1').css('display', 'none');
+        }
+    });
+
+
+
     if (window.location.href.indexOf('snippet=2') != -1) {
 
         cj('.cpd-message').hide();

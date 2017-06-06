@@ -1185,7 +1185,13 @@ function civi_cpd_report_get_uploaded_activity_list($user_id)
 
 
     while ($dao->fetch()) {
-        $uploadDate = substr($dao->evidence, 0, strrpos($dao->evidence, '-'));
+        // Reading date from file name both formats; Y-m-d and Y-m-d_His
+        $uploadDate = $dao->evidence;
+        if (strpos($dao->evidence, '_') !== false) {
+            $uploadDate = substr($uploadDate, 0, strrpos($uploadDate, '_'));
+        }else{
+            $uploadDate = substr($uploadDate, 0, strrpos($uploadDate, '-'));
+        }
 
         $pdf_upload_table .= '<tr>' .
             '<td valign="top">' . date("M d, Y", strtotime($uploadDate)) . '</td>' .
@@ -1966,7 +1972,9 @@ function civi_cpd_report_set_membership_info()
     $sql = "SELECT civicrm_membership_type.name as mem_types FROM civicrm_membership
             LEFT JOIN civicrm_membership_type
             ON civicrm_membership_type.id = civicrm_membership.membership_type_id
-            WHERE civicrm_membership.contact_id ='$cid'";
+            WHERE civicrm_membership.contact_id ='$cid' and civicrm_membership.is_test = 0
+            AND civicrm_membership.status_id IN (SELECT id FROM civicrm_membership_status WHERE
+            is_current_member = 1) ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 

@@ -110,3 +110,9 @@ body {
     float: right;
     margin-right: 20px;
 }
+
+.CPDnewActivityItem,
+.category-title > a,
+#crm-container p {
+    display: none;
+}

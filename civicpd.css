@@ -42,8 +42,8 @@ body.page-civicrm-civicpd #cover {
     z-index: 10;
 }
 
-#crm-notification-container .ui-notify-close {
-    position: absolute;
+#crm-notification-container .date-alert .ui-notify-close {
+    /*position: absolute;*/
     right: 1em;
     top: 10px;
 }
@@ -454,6 +454,8 @@ font-family: Helvetica,Arial,Sans;
     margin-bottom: 4px;
 
     padding: 4px 6px;
+
+    display: none;
 
 }
 
@@ -915,3 +917,52 @@ SPAN.searchword { background-color:yellow; }
 .notes-render {
     white-space: pre-wrap;
 }
+
+/* Modifications for civicrm 4.6 by Vincent */
+.crm-container table {
+    border: 1px solid #efefef;
+}
+
+.crm-container table {
+    margin: 0em 0em 1em;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#crm-container, .crm-container {
+    line-height: 135%;
+    margin-top: 35px;
+}
+
+.crm-container tbody {
+    border-top: none;
+}
+
+#crm-container, .crm-container {
+    line-height: 135%;
+    margin-top: 35px;
+}
+
+.crm-container tr {
+    font-size: .95em;
+    background: none;
+}
+
+.crm-container td {
+    padding: 4px;
+    vertical-align: top;
+}
+
+.crm-container th, .crm-container table.display thead th, .crm-container table thead.sticky th, .crm-container table.caseSelector tr.columnheader th {
+    background-color: #FFFFFF;
+    border-color: #FFFFFF #FFFFFF #CFCEC3;
+    border-style: solid;
+    border-width: 1px 1px 2px;
+    /*color: #A7A7A7;*/
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px;
+    text-align: left;
+    vertical-align: top;
+}
+
