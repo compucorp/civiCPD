@@ -1476,68 +1476,51 @@ function civi_cpd_report_update_activity()
 
 
     if (!empty($_POST['activity_id']) && !empty($_POST['category_id']) && civi_cpd_report_validate_date($_POST['credit_date']) && civi_cpd_report_validate_number($_POST['credits']) && !empty($_POST['notes']) && !empty($_POST['activity'])) {
+        $evidence = civi_cpd_report_import_activity_evidence_pdf();
+        if ($evidence === false) {
+            CRM_Civicpd_Page_CPDReport::redirectToReport();
+        }
 
-        $activityId = $_POST['activity_id'];
+        $updateCpdActivityQuery = "UPDATE civi_cpd_activities SET 
+                                   start_date = %1,
+                                   credit_date = %2,
+                                   credits = %3,
+                                   activity = %4,
+                                   notes = %5,
+                                   evidence = %6 
+                                   WHERE id = %7";
 
-        $startDate = (isset($_POST['start_date'])
-            && civi_cpd_report_validate_start_date($_POST['start_date']) ) ? "start_date='".$_POST['start_date']."'," : "start_date=NULL,";
-
-        $creditDate = $_POST['credit_date'];
+        $startDate = NULL;
+        if (
+          !empty($_POST['start_date'])
+          && civi_cpd_report_validate_start_date($_POST['start_date'])
+        ) {
+            $startDate = $_POST['start_date'];
+        }
 
         $credits = number_format($_POST['credits'], 2, '.', '');
 
-        $activity = $_POST['activity'];
+        $params = array(
+          1 => array($startDate, 'String'),
+          2 => array($_POST['credit_date'], 'Date'),
+          3 => array($credits, 'String'),
+          4 => array($_POST['activity'], 'String'),
+          5 => array($_POST['notes'], 'String'),
+          6 => array($evidence, 'String'),
+          7 => array($_POST['activity_id'], 'Integer'),
+        );
 
-        $notes = $_POST['notes'];
-
-        $evidence = civi_cpd_report_import_activity_evidence_pdf();
-
-
-        if ($evidence === false) {
-
-            CRM_Civicpd_Page_CPDReport::redirectToReport();
-
-        }
-
-
-        $sql = "
-
-            UPDATE civi_cpd_activities
-
-            SET
-
-                ".$startDate."
-
-                credit_date = '$creditDate',
-
-                credits = '$credits',
-
-                activity = '$activity',
-
-                notes = '$notes',
-
-                evidence = '$evidence'
-
-
-
-            WHERE id = $activityId";
-
-
-        CRM_Core_DAO::executeQuery($sql);
-
+        CRM_Core_DAO::executeQuery($updateCpdActivityQuery, $params);
 
         CRM_Core_Session::setStatus(' ', 'Activity updated', 'success', array('expires' => 2000));
 
-
         civi_cpd_report_set_edit_activity_response('update', $_POST['category_id'], TRUE);
-
 
         CRM_Civicpd_Page_CPDReport::redirectToReport();
 
-    } else {
-
+    }
+    else {
         civi_cpd_report_set_edit_activity_response('update', $_POST['category_id'], FALSE);
-
     }
 
 }
