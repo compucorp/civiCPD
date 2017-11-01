@@ -1495,19 +1495,23 @@ function civi_cpd_report_update_activity()
           !empty($_POST['start_date'])
           && civi_cpd_report_validate_start_date($_POST['start_date'])
         ) {
-            $startDate = $_POST['start_date'];
+            $startDate = CRM_Utils_Request::retrieve('start_date', 'String');
+            $startDate = CRM_Utils_Date::processDate($startDate, NULL, FALSE, 'Ymd');
         }
+
+        $creditDate = CRM_Utils_Request::retrieve('credit_date', 'String');
+        $creditDate = CRM_Utils_Date::processDate($creditDate, NULL, FALSE, 'Ymd');
 
         $credits = number_format($_POST['credits'], 2, '.', '');
 
         $params = array(
-          1 => array($startDate, 'String'),
-          2 => array($_POST['credit_date'], 'Date'),
-          3 => array($credits, 'String'),
-          4 => array($_POST['activity'], 'String'),
-          5 => array($_POST['notes'], 'String'),
-          6 => array($evidence, 'String'),
-          7 => array($_POST['activity_id'], 'Integer'),
+            1 => array($startDate, 'Date'),
+            2 => array($creditDate, 'Date'),
+            3 => array($credits, 'String'),
+            4 => array($_POST['activity'], 'String'),
+            5 => array($_POST['notes'], 'String'),
+            6 => array($evidence, 'String'),
+            7 => array($_POST['activity_id'], 'Integer'),
         );
 
         CRM_Core_DAO::executeQuery($updateCpdActivityQuery, $params);
